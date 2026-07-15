@@ -72,6 +72,11 @@
   .rate .big .cur{font-size:.95rem; color:var(--gold-dim); margin-right:6px}
   .rate .sub{display:flex; justify-content:space-between; align-items:center; gap:10px; margin-top:2px; flex-wrap:wrap}
   .rate .sub small{font-size:.71rem; color:var(--muted)}
+  .otras{display:flex; gap:8px; margin-top:12px; padding-top:11px; border-top:1px solid var(--line); flex-wrap:wrap}
+  .otras .t{flex:1 1 90px; min-width:0}
+  .otras .t .n{font-size:.62rem; text-transform:uppercase; letter-spacing:.07em; color:var(--muted); display:block}
+  .otras .t .v{font-family:var(--mono); font-size:.92rem; color:var(--text); display:block; margin-top:2px}
+  .otras .t .v.off{color:#5C6779; font-size:.75rem}
   .refresh{border:1px solid var(--line); border-radius:9px; padding:7px 12px; font-size:.78rem; color:var(--text); background:var(--surface-2); display:inline-flex; align-items:center; gap:6px}
   .refresh:active{transform:scale(.97)}
   .refresh.spin svg{animation:sp 1s linear infinite}
@@ -120,9 +125,14 @@
   .montoline{display:flex; gap:8px; align-items:stretch}
   .montoline input{flex:1 1 auto}
   .curtoggle{display:flex; background:var(--surface-2); border:1px solid var(--line); border-radius:10px; overflow:hidden; flex:none}
-  .curtoggle button{padding:0 13px; font-family:var(--mono); font-size:14px; color:var(--muted); min-width:44px}
+  .curtoggle button{padding:0 10px; font-family:var(--mono); font-size:13px; color:var(--muted); min-width:38px}
+  .curtoggle button:disabled{opacity:.35}
   .curtoggle button.on{background:var(--gold); color:#1a1305; font-weight:600}
-  .equiv{font-family:var(--mono); font-size:.77rem; color:var(--pos); margin:6px 0 0 2px}
+  .equiv{font-family:var(--mono); font-size:.76rem; color:var(--pos); margin:6px 0 0 2px; line-height:1.6}
+  .equiv .off{color:#5C6779}
+  .seg{display:flex; border:1px solid var(--line); border-radius:10px; overflow:hidden; background:var(--surface-2)}
+  .seg button{flex:1 1 0; padding:10px 6px; font-size:.76rem; color:var(--muted); line-height:1.3}
+  .seg button.on{background:var(--gold); color:#1a1305; font-weight:600}
 
   .duo{display:grid; grid-template-columns:1fr; gap:13px; align-items:start}
   @media(min-width:520px){ .duo{grid-template-columns:1fr 1fr; gap:10px} }
@@ -163,7 +173,7 @@
   .final .k small{display:block; text-transform:none; letter-spacing:0; color:var(--muted); font-size:.68rem; font-weight:400; margin-top:2px}
   .final .v{font-family:var(--mono); text-align:right; flex:none}
   .final .v .bs{color:var(--gold); font-weight:600; font-size:1.3rem; display:block; line-height:1.15}
-  .final .v .usd{color:var(--gold-dim); font-size:.8rem}
+  .final .v .usd{color:var(--gold-dim); font-size:.78rem; line-height:1.5}
   .totalrow{display:flex; justify-content:space-between; align-items:baseline; gap:10px; margin-top:9px; padding-top:9px; border-top:1px solid var(--line)}
   .totalrow .k{font-size:.78rem; color:var(--muted); flex:1 1 auto; min-width:0}
   .totalrow .v{font-family:var(--mono); font-size:.88rem; text-align:right; flex:none}
@@ -241,6 +251,10 @@
       Actualizar
     </button>
   </div>
+  <div class="otras">
+    <div class="t"><span class="n">€ Euro BCV</span><span class="v" id="tEur">—</span></div>
+    <div class="t"><span class="n">₮ USDT P2P</span><span class="v" id="tUsdt">—</span></div>
+  </div>
 </section>
 
 <div class="alerta" id="alertaGlobal"></div>
@@ -251,11 +265,11 @@
   <div class="body">
     Cada producto sigue estos pasos, en este orden:
     <ol>
-      <li>Partimos del <b>costo de una unidad</b> (lo escribes en Bs o en $; la app convierte con la tasa del BCV).</li>
+      <li>Partimos del <b>costo de una unidad</b>. Lo escribes en <b>Bs, $, € o USDT</b> — la app convierte con la tasa de esa moneda.</li>
       <li>Si el producto <b>lleva IVA</b>, se le suma ese porcentaje.</li>
       <li>Se le suma tu <b>margen de ganancia</b>, que puedes cambiar producto por producto.</li>
       <li>Opcional: le sumas un <b>colchón fijo en Bs</b>, para protegerte de que el dólar suba.</li>
-      <li>Eso da el <b>precio final por unidad</b>. Si pones cantidad, se <b>multiplica</b> para mostrarte el total que tienes.</li>
+      <li>Eso da el <b>precio final por unidad</b>, que verás en las cuatro monedas a la vez. Si pones cantidad, se <b>multiplica</b> para darte el total.</li>
     </ol>
     <div style="margin-top:9px">Si cargaste el costo <b>en Bs</b> y el dólar cambia, la app te avisa debajo del producto y te ofrece actualizarlo.</div>
   </div>
@@ -268,6 +282,12 @@
   <div><label for="ganInput">Ganancia % por defecto</label>
     <input id="ganInput" class="num" type="number" inputmode="decimal" step="1" value="40" />
     <div class="hint">Sugerida al crear. Cada producto lleva la suya.</div></div>
+  <div style="grid-column:1/-1"><label>Tasa del USDT · ¿cuál lado del P2P?</label>
+    <div class="seg" id="segUsdt">
+      <button data-lado="ask">Lo que pagas por 1 USDT</button>
+      <button data-lado="bid">Lo que te dan por 1 USDT</button>
+    </div>
+    <div class="hint">En Binance P2P los dos precios son distintos. Elige el que tu equipo usa de referencia.</div></div>
 </div>
 
 <div class="sec">
@@ -289,7 +309,9 @@
 
 <footer>
   Fórmula por unidad: Costo + IVA + Ganancia + colchón opcional = precio final. La cantidad multiplica para darte el total.
-  Tasa BCV vía <a href="https://ve.dolarapi.com/v1/dolares/oficial" target="_blank" rel="noopener">DolarAPI</a> (referencial).
+  Dólar y Euro del BCV vía <a href="https://dolarapi.com/docs/venezuela/" target="_blank" rel="noopener">DolarAPI</a>;
+  USDT de Binance P2P vía <a href="https://docs.criptoya.com/venezuela/" target="_blank" rel="noopener">CriptoYa</a>. Valores referenciales.
+  Los precios se calculan sobre la tasa BCV del dólar; el resto son equivalencias.
   Al guardar se anota la tasa del momento para avisarte cuando el dólar cambie.
 </footer>
 </div>
@@ -325,8 +347,25 @@ const safeParse=s=>{ try{ return JSON.parse(s); }catch(e){ return null; } };
 const norm=s=>String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim();
 const uuid=()=>{ try{ return crypto.randomUUID(); }catch(e){ return 'x'+Date.now()+Math.random().toString(16).slice(2); } };
 
-let rate=0, fecha='', fuente='', consultada='';
-let products=[], settings={iva:16,gan:40}, filtro='';
+// tasas[x] = cuántos Bs vale 1 unidad de esa moneda. El Bs es la base.
+let tasas={ bs:1, usd:0, eur:0, usdt:0 };
+let fechaEur='';
+let rate=0, fecha='', fuente='', consultada='';   // rate = tasas.usd (BCV), base de precios
+let products=[], settings={iva:16,gan:40,usdtLado:'ask'}, filtro='';
+const MONEDAS = {
+  bs:   { sim:'Bs', nom:'Bolívares',  btn:'Bs' },
+  usd:  { sim:'$',  nom:'Dólar BCV',  btn:'$'  },
+  eur:  { sim:'€',  nom:'Euro BCV',   btn:'€'  },
+  usdt: { sim:'₮',  nom:'USDT P2P',   btn:'₮'  }
+};
+const enMoneda = (bsVal, cur) => {
+  const t = cur==='bs' ? 1 : (tasas[cur]||0);
+  return t ? bsVal/t : null;
+};
+const fmtMon = (bsVal, cur) => {
+  const v = enMoneda(bsVal, cur);
+  return v===null ? MONEDAS[cur].sim+' —' : MONEDAS[cur].sim+' '+fmt.format(v);
+};
 let sb=null, user=null, MODO='local';
 
 /* ---------- arranque de Supabase ---------- */
@@ -343,12 +382,15 @@ if(cfgOk){
 const aFila = p => ({
   id:p.id, nombre:p.name||'', monto:Number(p.monto)||0, moneda:p.cur||'bs',
   cantidad:Number(p.cant)||1, iva:!!p.iva, ganancia:Number(ganDe(p))||0, colchon:Number(p.colchon)||0,
-  snap_rate:p.snap?.rate ?? null, snap_costo_usd:p.snap?.costoUSD ?? null, snap_ts:p.snap?.ts ?? null
+  snap_rate:p.snap?.rate ?? null, snap_costo_usd:p.snap?.costoUSD ?? null, snap_ts:p.snap?.ts ?? null,
+  snap_tasa_eur:p.snap?.eur ?? null, snap_tasa_usdt:p.snap?.usdt ?? null
 });
 const aProd = f => ({
   id:f.id, name:f.nombre||'', monto:f.monto, cur:f.moneda||'bs', cant:f.cantidad??1,
   iva:!!f.iva, gan:f.ganancia, colchon:Number(f.colchon)||0 ? f.colchon : '',
-  snap: f.snap_rate ? { rate:Number(f.snap_rate), costoUSD:Number(f.snap_costo_usd), ts:f.snap_ts } : null,
+  snap: f.snap_rate ? { rate:Number(f.snap_rate), costoUSD:Number(f.snap_costo_usd), ts:f.snap_ts,
+                        eur:f.snap_tasa_eur?Number(f.snap_tasa_eur):null,
+                        usdt:f.snap_tasa_usdt?Number(f.snap_tasa_usdt):null } : null,
   saved:true
 });
 
@@ -389,9 +431,11 @@ async function bajarTodo(){
   cacheLocal();
   if(!ra.error && ra.data){
     settings.iva = Number(ra.data.iva); settings.gan = Number(ra.data.ganancia);
+    if(ra.data.usdt_lado) settings.usdtLado = ra.data.usdt_lado;
     store.set('bcv_settings', JSON.stringify(settings));
     document.getElementById('ivaInput').value = settings.iva;
     document.getElementById('ganInput').value = settings.gan;
+    syncSegUsdt();
   }
   renderList();
 }
@@ -401,7 +445,9 @@ function subirAjustes(){
   if(MODO!=='nube' || !user) return;
   clearTimeout(ajusteT);
   ajusteT=setTimeout(async ()=>{
-    const { error } = await sb.from('ajustes').update({ iva:Number(settings.iva)||0, ganancia:Number(settings.gan)||0 }).eq('id',1);
+    const { error } = await sb.from('ajustes').update({
+      iva:Number(settings.iva)||0, ganancia:Number(settings.gan)||0, usdt_lado:settings.usdtLado||'ask'
+    }).eq('id',1);
     if(error) netErr('No se pudieron guardar los ajustes en la nube: '+error.message);
   }, 700);
 }
@@ -416,31 +462,56 @@ function cargarCache(){
     if(!p.id) p.id=uuid();
   });
   const c=safeParse(store.get('bcv_rate_cache'));
-  if(c){ rate=c.rate; fecha=c.fecha; fuente=c.fuente; consultada=c.consultada||''; }
+  if(c){
+    rate=c.rate; fecha=c.fecha; fuente=c.fuente; consultada=c.consultada||''; fechaEur=c.fechaEur||'';
+    if(c.tasas) tasas=Object.assign(tasas, c.tasas);
+    tasas.usd = tasas.usd || rate;
+  }
 }
 
 /* ---------- tasa BCV ---------- */
+// ?_=<timestamp> obliga a que sea una URL nueva: ni el navegador ni ningún
+// proxy intermedio pueden devolver una respuesta guardada de antes.
+const sinCache = u => fetch(u + (u.includes('?')?'&':'?') + '_=' + Date.now(),
+  { cache:'no-store', headers:{ 'Cache-Control':'no-cache', 'Pragma':'no-cache' } });
+
 async function fetchRate(manual){
   const btn=document.getElementById('refreshBtn'), dot=document.getElementById('statusDot');
   if(manual) btn.classList.add('spin');
-  try{
-    // ?_=<timestamp> obliga a que sea una URL nueva: ni el navegador ni ningún
-    // proxy intermedio pueden devolver una respuesta guardada de antes.
-    const r=await fetch('https://ve.dolarapi.com/v1/dolares/oficial?_='+Date.now(),
-      { cache:'no-store', headers:{ 'Cache-Control':'no-cache', 'Pragma':'no-cache' } });
-    if(!r.ok) throw new Error('http '+r.status);
-    const d=await r.json();
-    const val=d.promedio ?? d.venta ?? d.compra;
-    if(!val) throw new Error('sin valor');
-    rate=Number(val); fecha=d.fechaActualizacion||new Date().toISOString(); fuente='DolarAPI';
-    consultada=new Date().toISOString();
-    store.set('bcv_rate_cache', JSON.stringify({rate,fecha,fuente,consultada}));
-    dot.className='dot live'; renderRate(); renderList();
-  }catch(err){
-    dot.className = rate?'dot live':'dot err';
-    if(rate) renderRate();
-    console.warn('No se pudo actualizar la tasa:', err);
-  }finally{ if(manual) setTimeout(()=>btn.classList.remove('spin'),500); }
+
+  // Las tres fuentes se piden en paralelo y cada una falla por su cuenta:
+  // si el USDT se cae, el dólar y el euro siguen funcionando igual.
+  const [rUsd, rEur, rUsdt] = await Promise.allSettled([
+    sinCache('https://ve.dolarapi.com/v1/dolares/oficial').then(r=>r.ok?r.json():Promise.reject(r.status)),
+    sinCache('https://ve.dolarapi.com/v1/euros/oficial').then(r=>r.ok?r.json():Promise.reject(r.status)),
+    sinCache('https://criptoya.com/api/binancep2p/USDT/VES/1').then(r=>r.ok?r.json():Promise.reject(r.status))
+  ]);
+
+  if(rUsd.status==='fulfilled'){
+    const d=rUsd.value, val=d.promedio ?? d.venta ?? d.compra;
+    if(val){
+      tasas.usd=Number(val); rate=tasas.usd;
+      fecha=d.fechaActualizacion||new Date().toISOString(); fuente='DolarAPI';
+      consultada=new Date().toISOString();
+    }
+  } else console.warn('Dólar BCV no disponible:', rUsd.reason);
+
+  if(rEur.status==='fulfilled'){
+    const d=rEur.value, val=d.promedio ?? d.venta ?? d.compra;
+    if(val){ tasas.eur=Number(val); fechaEur=d.fechaActualizacion||''; }
+  } else console.warn('Euro BCV no disponible:', rEur.reason);
+
+  if(rUsdt.status==='fulfilled'){
+    const d=rUsdt.value;
+    // ask = lo que pagas por 1 USDT | bid = lo que te dan por 1 USDT
+    const val = settings.usdtLado==='bid' ? d.bid : d.ask;
+    if(val) tasas.usdt=Number(val);
+  } else console.warn('USDT P2P no disponible:', rUsdt.reason);
+
+  if(rate) store.set('bcv_rate_cache', JSON.stringify({rate,fecha,fuente,consultada,tasas,fechaEur}));
+  dot.className = rate?'dot live':'dot err';
+  renderRate(); renderList();
+  if(manual) setTimeout(()=>btn.classList.remove('spin'),500);
 }
 function haceCuanto(iso){
   const t=new Date(iso).getTime();
@@ -464,6 +535,12 @@ function renderRate(){
   const vig = !isNaN(dt) ? 'Tasa vigente '+dt.toLocaleDateString('es-VE',{day:'2-digit',month:'short'}) : 'Última tasa conocida';
   const con = consultada ? ' · consultada '+haceCuanto(consultada) : '';
   f.textContent = vig + con;
+  // Tasas secundarias: si alguna no cargó, se dice, no se inventa.
+  const eEur=document.getElementById('tEur'), eUsdt=document.getElementById('tUsdt');
+  if(tasas.eur){ eEur.textContent='Bs '+fmtRate.format(tasas.eur); eEur.classList.remove('off'); }
+  else { eEur.textContent='no disponible'; eEur.classList.add('off'); }
+  if(tasas.usdt){ eUsdt.textContent='Bs '+fmtRate.format(tasas.usdt); eUsdt.classList.remove('off'); }
+  else { eUsdt.textContent='no disponible'; eUsdt.classList.add('off'); }
 }
 
 /* ---------- fórmula ---------- */
@@ -471,9 +548,10 @@ function ganDe(p){ return (p.gan===''||p.gan==null)?(Number(settings.gan)||0):(N
 function cantDe(p){ const n=Number(p.cant); return (!n||n<1)?1:n; }
 function compute(p){
   const monto=Number(p.monto)||0;
-  let costoBs,costoUSD;
-  if(p.cur==='usd'){ costoUSD=monto; costoBs=rate?monto*rate:0; }
-  else { costoBs=monto; costoUSD=rate?monto/rate:0; }
+  // Todo se lleva a Bs, que es la base; desde ahí se reexpresa en cualquier moneda.
+  const t = p.cur==='bs' ? 1 : (tasas[p.cur]||0);
+  const costoBs = p.cur==='bs' ? monto : (t ? monto*t : 0);
+  const costoUSD = rate ? costoBs/rate : 0;
   const ivaF=p.iva?(Number(settings.iva)||0)/100:0, ganF=ganDe(p)/100;
   const ivaBs=costoBs*ivaF, ganBs=costoBs*ganF;
   const preColch=costoBs*(1+ivaF+ganF), colch=Number(p.colchon)||0;
@@ -536,7 +614,7 @@ function buildCard(p){
 function renderView(card,p){
   const c=compute(p), ct=cambioTasa(p);
   if(ct&&ct.subio) card.classList.add('alert');
-  const costoTxt = p.cur==='usd'?usd(Number(p.monto)||0):bs(Number(p.monto)||0);
+  const costoTxt = MONEDAS[p.cur].sim+' '+fmt.format(Number(p.monto)||0);
   const colchTxt = c.colch>0?` · colchón +${bs(c.colch)}`:'';
   card.innerHTML=`
     <div class="vhead">
@@ -557,9 +635,9 @@ function renderView(card,p){
       <button class="btn btn-danger delbtn">Eliminar</button>
     </div>`;
   const q=s=>card.querySelector(`[data-o="${s}"]`);
-  q('unitbs').textContent=bs(c.unitBs); q('unitusd').textContent=usd(c.unitUSD);
+  q('unitbs').textContent=bs(c.unitBs); q('unitusd').innerHTML=otrasMonedas(c.unitBs,'bs');
   q('cant').textContent=c.cant; q('plural').textContent=c.cant===1?'':'es';
-  q('totalbs').textContent=bs(c.totalBs); q('totalusd').textContent=usd(c.totalUSD);
+  q('totalbs').textContent=bs(c.totalBs); q('totalusd').innerHTML=otrasMonedas(c.totalBs,'bs');
   if(ct){
     const d=new Date(ct.ts), f=!isNaN(d)?d.toLocaleDateString('es-VE',{day:'2-digit',month:'short'}):'';
     card.querySelector('[data-rc]').innerHTML=`
@@ -574,7 +652,7 @@ function renderView(card,p){
       e.target.disabled=true;
       p.monto=Number(ct.nuevoMontoBs.toFixed(2));
       const nc=compute(p);
-      p.snap={ rate, costoUSD:nc.costoUSD, ts:new Date().toISOString() };
+      p.snap={ rate, costoUSD:nc.costoUSD, eur:tasas.eur||null, usdt:tasas.usdt||null, ts:new Date().toISOString() };
       await subirProducto(p);
       replaceCard(card,p); renderAlertaGlobal();
     });
@@ -600,10 +678,10 @@ function renderEditor(card,p){
     <div class="block"><label>2 · Costo de una unidad</label>
       <div class="montoline">
         <input data-f="monto" class="num" type="number" inputmode="decimal" step="0.01" placeholder="0,00" value="${p.monto ?? ''}" />
-        <div class="curtoggle"><button data-cur="bs">Bs</button><button data-cur="usd">$</button></div>
+        <div class="curtoggle">${Object.keys(MONEDAS).map(k=>`<button data-cur="${k}">${MONEDAS[k].btn}</button>`).join('')}</div>
       </div>
       <div class="equiv" data-o="equiv">—</div>
-      <div class="hint">Lo que te cuesta <b>una sola unidad</b>. Escríbelo en Bs o en $: la app convierte con la tasa del BCV.</div></div>
+      <div class="hint">Lo que te cuesta <b>una sola unidad</b>. Escríbelo en la moneda que quieras: la app convierte con la tasa de esa moneda.</div></div>
     <div class="duo block">
       <div><label>3 · Cantidad que tienes</label>
         <input data-f="cant" class="num" type="number" inputmode="numeric" step="1" placeholder="1" value="${p.cant ?? 1}" />
@@ -651,9 +729,18 @@ function renderEditor(card,p){
     </div>`;
 
   const curBtns=card.querySelectorAll('.curtoggle button');
-  const setCur=()=>curBtns.forEach(b=>b.classList.toggle('on', b.dataset.cur===p.cur));
+  const setCur=()=>curBtns.forEach(b=>{
+    b.classList.toggle('on', b.dataset.cur===p.cur);
+    // Sin tasa no se puede convertir: se desactiva en vez de dar un número falso.
+    const k=b.dataset.cur;
+    b.disabled = (k!=='bs' && !tasas[k]);
+    b.title = b.disabled ? MONEDAS[k].nom+' no disponible ahora' : MONEDAS[k].nom;
+  });
   setCur();
-  curBtns.forEach(b=>b.addEventListener('click',()=>{ p.cur=b.dataset.cur; setCur(); cacheLocal(); recalcCard(card,p); }));
+  curBtns.forEach(b=>b.addEventListener('click',()=>{
+    if(b.disabled) return;
+    p.cur=b.dataset.cur; setCur(); cacheLocal(); recalcCard(card,p);
+  }));
 
   const ganChips=card.querySelectorAll('[data-ganchips] .chip');
   const syncGan=()=>ganChips.forEach(b=>b.classList.toggle('on', Number(b.dataset.gan)===Number(p.gan)));
@@ -702,7 +789,7 @@ function renderEditor(card,p){
     if(!(Number(p.cant)>0)) p.cant=1;
     const btn=e.target; btn.disabled=true; btn.textContent='Guardando…';
     const c=compute(p);
-    if(rate) p.snap={ rate, costoUSD:c.costoUSD, ts:new Date().toISOString() };
+    if(rate) p.snap={ rate, costoUSD:c.costoUSD, eur:tasas.eur||null, usdt:tasas.usdt||null, ts:new Date().toISOString() };
     p.saved=true; delete p._new; delete p._backup;
     await subirProducto(p);
     replaceCard(card,p); renderAlertaGlobal();
@@ -715,20 +802,29 @@ function renderEditor(card,p){
   recalcCard(card,p);
 }
 
+// Devuelve "$ 1,35 · € 1,18 · ₮ 1,42" con las monedas distintas a `salvo`.
+function otrasMonedas(bsVal, salvo){
+  return Object.keys(MONEDAS).filter(k=>k!==salvo).map(k=>{
+    const v=enMoneda(bsVal,k);
+    return v===null ? `<span class="off">${MONEDAS[k].sim} —</span>` : `${MONEDAS[k].sim} ${fmt.format(v)}`;
+  }).join(' · ');
+}
 function recalcCard(card,p){
   const c=compute(p), q=s=>card.querySelector(`[data-o="${s}"]`);
   const set=(s,v)=>{ const el=q(s); if(el) el.textContent=v; };
   const eq=q('equiv');
   if(eq){
-    if(!rate) eq.textContent='Esperando tasa del BCV…';
-    else if(p.cur==='usd') eq.textContent='= '+bs(c.costoBs)+' a la tasa de hoy';
-    else eq.textContent='= '+usd(c.costoUSD)+' a la tasa de hoy';
+    const t = p.cur==='bs' ? 1 : (tasas[p.cur]||0);
+    if(!t) eq.textContent='Esperando la tasa de '+MONEDAS[p.cur].nom+'…';
+    else eq.innerHTML = '= ' + otrasMonedas(c.costoBs, p.cur) + ' <span class="off">a las tasas de hoy</span>';
   }
   set('costo',bs(c.costoBs)); set('ivapct',(Number(settings.iva)||0)+'%'); set('ganpct',ganDe(p)+'%');
   set('iva',bs(c.ivaBs)); set('gan',bs(c.ganBs)); set('colch',bs(c.colch));
-  set('unitbs',bs(c.unitBs)); set('unitusd',usd(c.unitUSD));
+  set('unitbs',bs(c.unitBs));
+  const eu=q('unitusd'); if(eu) eu.innerHTML=otrasMonedas(c.unitBs,'bs');
   set('cant',c.cant); set('plural',c.cant===1?'':'es');
-  set('totalbs',bs(c.totalBs)); set('totalusd',usd(c.totalUSD));
+  set('totalbs',bs(c.totalBs));
+  const et=q('totalusd'); if(et) et.innerHTML=otrasMonedas(c.totalBs,'bs');
   const ivarow=card.querySelector('[data-ivarow]'); if(ivarow) ivarow.classList.toggle('hide',!p.iva);
   const colchrow=card.querySelector('[data-colchrow]'); if(colchrow) colchrow.classList.toggle('hide',!(c.colch>0));
 }
@@ -756,6 +852,15 @@ document.getElementById('addBtn').addEventListener('click',()=>{
   if(last){ last.scrollIntoView({behavior:'smooth',block:'center'}); const fi=last.querySelector('input'); if(fi) fi.focus(); }
 });
 document.getElementById('refreshBtn').addEventListener('click',()=>fetchRate(true));
+const segUsdt=document.getElementById('segUsdt');
+function syncSegUsdt(){
+  segUsdt.querySelectorAll('button').forEach(b=>b.classList.toggle('on', b.dataset.lado===(settings.usdtLado||'ask')));
+}
+segUsdt.querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{
+  settings.usdtLado=b.dataset.lado; syncSegUsdt(); subirAjustes();
+  fetchRate(true);   // el lado cambió: hay que volver a pedir el precio correcto
+}));
+
 const ivaInput=document.getElementById('ivaInput');
 ivaInput.addEventListener('input',()=>{ settings.iva=ivaInput.value; subirAjustes(); renderList(); });
 const ganInput=document.getElementById('ganInput');
@@ -802,7 +907,7 @@ setInterval(()=>fetchRate(false), 30*60*1000);
 
 /* ---------- boot ---------- */
 cargarCache();
-ivaInput.value=settings.iva; ganInput.value=settings.gan;
+ivaInput.value=settings.iva; ganInput.value=settings.gan; syncSegUsdt();
 if(MODO==='nube'){
   const { data } = await sb.auth.getSession();
   if(data.session){ user=data.session.user; entrarApp(); }
