@@ -26,135 +26,145 @@
   html,body{margin:0}
   body{background:var(--ink); color:var(--text); font-family:var(--body);
     -webkit-font-smoothing:antialiased; line-height:1.45;
-    padding:0 16px calc(40px + env(safe-area-inset-bottom)) 16px; max-width:680px; margin:0 auto;}
+    padding:0 14px calc(40px + env(safe-area-inset-bottom)) 14px; max-width:680px; margin:0 auto;
+    overflow-x:hidden;}
   h1{font-family:var(--disp); font-weight:700; font-size:1.05rem; letter-spacing:.02em; margin:0}
   .num{font-family:var(--mono); font-variant-numeric:tabular-nums}
   button{font-family:var(--body); cursor:pointer; border:none; background:none; color:inherit}
   input{font-family:var(--mono); background:var(--surface-2); color:var(--text);
-    border:1px solid var(--line); border-radius:10px; padding:10px 12px; font-size:15px; width:100%}
+    border:1px solid var(--line); border-radius:10px; padding:11px 12px; font-size:16px; width:100%; min-width:0}
   input:focus{outline:none; border-color:var(--gold); box-shadow:0 0 0 3px rgba(231,177,90,.15)}
   input.err{border-color:var(--danger); box-shadow:0 0 0 3px rgba(228,105,91,.15)}
   input::placeholder{color:#5C6779}
   label{display:block; font-size:.7rem; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); margin:0 0 5px 2px}
-  .hint{font-size:.74rem; color:var(--muted); margin:5px 0 0 2px; line-height:1.45}
+  .hint{font-size:.73rem; color:var(--muted); margin:5px 0 0 2px; line-height:1.45}
 
-  header{display:flex; align-items:center; gap:10px; padding:20px 2px 14px}
+  header{display:flex; align-items:center; gap:10px; padding:18px 2px 12px}
   header .dot{width:9px; height:9px; border-radius:50%; background:var(--muted); flex:none; transition:.3s}
   header .dot.live{background:var(--pos); box-shadow:0 0 10px rgba(89,195,155,.6)}
   header .dot.err{background:var(--danger)}
 
   .rate{position:sticky; top:0; z-index:20;
     background:linear-gradient(180deg,#1A2130 0%,#161C29 100%);
-    border:1px solid var(--line); border-radius:16px; padding:16px 18px;
-    box-shadow:0 8px 24px rgba(0,0,0,.35); backdrop-filter:blur(6px);}
-  .rate .top{display:flex; justify-content:space-between; align-items:baseline}
-  .rate .lbl{font-size:.72rem; text-transform:uppercase; letter-spacing:.1em; color:var(--muted)}
-  .rate .big{font-family:var(--mono); font-weight:600; font-size:2.35rem; color:var(--gold); line-height:1.05; margin:4px 0 2px; letter-spacing:-.01em}
-  .rate .big .cur{font-size:1rem; color:var(--gold-dim); margin-right:6px}
-  .rate .sub{display:flex; justify-content:space-between; align-items:center; gap:10px; margin-top:4px}
-  .rate .sub small{font-size:.72rem; color:var(--muted)}
+    border:1px solid var(--line); border-radius:16px; padding:14px 16px;
+    box-shadow:0 8px 24px rgba(0,0,0,.45);}
+  .rate .top{display:flex; justify-content:space-between; align-items:baseline; gap:8px}
+  .rate .lbl{font-size:.68rem; text-transform:uppercase; letter-spacing:.09em; color:var(--muted)}
+  .rate .big{font-family:var(--mono); font-weight:600; font-size:2.1rem; color:var(--gold); line-height:1.05; margin:4px 0 2px; letter-spacing:-.01em}
+  .rate .big .cur{font-size:.95rem; color:var(--gold-dim); margin-right:6px}
+  .rate .sub{display:flex; justify-content:space-between; align-items:center; gap:10px; margin-top:2px; flex-wrap:wrap}
+  .rate .sub small{font-size:.71rem; color:var(--muted)}
   .refresh{border:1px solid var(--line); border-radius:9px; padding:7px 12px; font-size:.78rem; color:var(--text); background:var(--surface-2); display:inline-flex; align-items:center; gap:6px}
   .refresh:active{transform:scale(.97)}
   .refresh.spin svg{animation:sp 1s linear infinite}
   @keyframes sp{to{transform:rotate(360deg)}}
 
-  /* aviso global de erosión */
   .alerta{display:none; margin-top:12px; border:1px solid rgba(224,163,62,.45); background:rgba(224,163,62,.09);
-    border-radius:13px; padding:13px 14px; font-size:.84rem; line-height:1.5}
+    border-radius:13px; padding:12px 13px; font-size:.83rem; line-height:1.5}
   .alerta.show{display:block}
   .alerta b{color:var(--warn)}
 
-  /* explicador */
   details.expl{margin-top:12px; border:1px solid var(--line); background:var(--surface); border-radius:13px; overflow:hidden}
-  details.expl summary{list-style:none; cursor:pointer; padding:12px 14px; font-size:.84rem; font-weight:600; color:var(--gold); display:flex; justify-content:space-between; align-items:center}
+  details.expl summary{list-style:none; cursor:pointer; padding:12px 14px; font-size:.83rem; font-weight:600; color:var(--gold); display:flex; justify-content:space-between; align-items:center; gap:8px}
   details.expl summary::-webkit-details-marker{display:none}
-  details.expl summary::after{content:'▾'; color:var(--muted); font-size:.8rem}
+  details.expl summary::after{content:'▾'; color:var(--muted); font-size:.8rem; flex:none}
   details.expl[open] summary::after{content:'▴'}
-  details.expl .body{padding:0 14px 14px; font-size:.82rem; color:var(--muted); line-height:1.65}
-  details.expl .body ol{margin:8px 0 0; padding-left:20px}
+  details.expl .body{padding:0 14px 14px; font-size:.81rem; color:var(--muted); line-height:1.65}
+  details.expl .body ol{margin:8px 0 0; padding-left:19px}
   details.expl .body li{margin-bottom:5px}
   details.expl .body b{color:var(--text); font-weight:600}
 
-  .settings{display:flex; gap:10px; margin:14px 0 0}
-  .settings .field{flex:1}
-  .sec{display:flex; justify-content:space-between; align-items:center; margin:24px 2px 12px}
-  .sec h2{font-family:var(--disp); font-size:.82rem; text-transform:uppercase; letter-spacing:.1em; color:var(--muted); font-weight:600; margin:0}
-  .add{border:1px dashed var(--gold-dim); color:var(--gold); border-radius:10px; padding:8px 14px; font-size:.82rem; font-weight:600}
+  .settings{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:12px 0 0; align-items:start}
+  .sec{display:flex; justify-content:space-between; align-items:center; margin:22px 2px 12px; gap:10px}
+  .sec h2{font-family:var(--disp); font-size:.8rem; text-transform:uppercase; letter-spacing:.1em; color:var(--muted); font-weight:600; margin:0}
+  .add{border:1px dashed var(--gold-dim); color:var(--gold); border-radius:10px; padding:8px 14px; font-size:.82rem; font-weight:600; flex:none}
   .add:active{transform:scale(.98)}
 
-  .card{background:var(--surface); border:1px solid var(--line); border-radius:14px; padding:14px; margin-bottom:12px}
+  .card{background:var(--surface); border:1px solid var(--line); border-radius:14px; padding:13px; margin-bottom:12px; overflow:hidden}
   .card.saved{border-color:#33405A}
   .card.alert{border-color:rgba(224,163,62,.55)}
-  .block{margin-bottom:12px}
+  .block{margin-bottom:13px}
   .montoline{display:flex; gap:8px; align-items:stretch}
-  .montoline input{flex:1}
+  .montoline input{flex:1 1 auto}
   .curtoggle{display:flex; background:var(--surface-2); border:1px solid var(--line); border-radius:10px; overflow:hidden; flex:none}
-  .curtoggle button{padding:0 13px; font-family:var(--mono); font-size:14px; color:var(--muted); min-width:42px}
+  .curtoggle button{padding:0 13px; font-family:var(--mono); font-size:14px; color:var(--muted); min-width:44px}
   .curtoggle button.on{background:var(--gold); color:#1a1305; font-weight:600}
-  .equiv{font-family:var(--mono); font-size:.78rem; color:var(--pos); margin:6px 0 0 2px}
-  .grid2{display:grid; grid-template-columns:1fr 1fr; gap:10px}
-  .ivatoggle{display:flex; align-items:center; gap:9px; padding:0 12px; border:1px solid var(--line); border-radius:10px; background:var(--surface-2); user-select:none; height:100%}
-  .ivatoggle input{width:auto; flex:none}
-  .ivatoggle small{font-size:.82rem; color:var(--muted)}
+  .equiv{font-family:var(--mono); font-size:.77rem; color:var(--pos); margin:6px 0 0 2px}
+
+  /* fila cantidad + iva: apilada en móvil, lado a lado en pantallas anchas */
+  .duo{display:grid; grid-template-columns:1fr; gap:13px; align-items:start}
+  @media(min-width:520px){ .duo{grid-template-columns:1fr 1fr; gap:10px} }
+  .duo > div{min-width:0}
+  .ivatoggle{display:flex; align-items:center; gap:9px; padding:12px; border:1px solid var(--line); border-radius:10px; background:var(--surface-2); user-select:none}
+  .ivatoggle input{width:auto; flex:none; margin:0}
+  .ivatoggle small{font-size:.85rem; color:var(--muted)}
   .ivatoggle.active small{color:var(--text)}
 
-  /* chips */
-  .chips{display:flex; gap:7px; flex-wrap:wrap; margin-bottom:7px}
-  .chip{border:1px solid var(--line); background:var(--surface-2); border-radius:999px; padding:7px 14px;
-    font-family:var(--mono); font-size:.82rem; color:var(--muted)}
+  .chips{display:flex; gap:7px; flex-wrap:wrap; margin-bottom:8px}
+  .chip{border:1px solid var(--line); background:var(--surface-2); border-radius:999px; padding:8px 14px;
+    font-family:var(--mono); font-size:.82rem; color:var(--muted); flex:none}
   .chip.on{background:var(--gold); border-color:var(--gold); color:#1a1305; font-weight:600}
   .chip:active{transform:scale(.96)}
 
-  /* colchón desplegable */
-  .colch{border:1px dashed var(--line); border-radius:12px; padding:12px; margin-bottom:12px}
+  .colch{border:1px dashed var(--line); border-radius:12px; padding:12px; margin-bottom:13px}
   .colch.on{border-style:solid; border-color:var(--gold-dim); background:rgba(231,177,90,.05)}
   .colch .head{display:flex; justify-content:space-between; align-items:center; gap:10px; cursor:pointer}
-  .colch .head .t{font-size:.84rem; font-weight:600; color:var(--gold)}
-  .colch .head .st{font-family:var(--mono); font-size:.78rem; color:var(--muted)}
+  .colch .head .t{font-size:.83rem; font-weight:600; color:var(--gold); line-height:1.35}
+  .colch .head .st{font-family:var(--mono); font-size:.74rem; color:var(--muted); flex:none; white-space:nowrap}
   .colch .inner{margin-top:11px}
   .colch.closed .inner{display:none}
 
-  /* pasos */
   .steps{margin-top:12px; border-top:1px solid var(--line); padding-top:12px}
-  .step{display:flex; gap:10px; align-items:flex-start; margin-bottom:9px}
+  .step{display:flex; gap:9px; align-items:flex-start; margin-bottom:9px}
   .step .n{flex:none; width:19px; height:19px; border-radius:50%; background:var(--surface-2); border:1px solid var(--line);
-    font-family:var(--mono); font-size:.62rem; color:var(--muted); display:flex; align-items:center; justify-content:center; margin-top:1px}
-  .step .txt{flex:1; min-width:0}
-  .step .k{font-size:.8rem; color:var(--text)}
-  .step .d{font-size:.7rem; color:var(--muted); line-height:1.4}
-  .step .v{font-family:var(--mono); font-size:.82rem; text-align:right; white-space:nowrap; color:var(--text)}
+    font-family:var(--mono); font-size:.6rem; color:var(--muted); display:flex; align-items:center; justify-content:center; margin-top:1px}
+  .step .txt{flex:1 1 auto; min-width:0}
+  .step .k{font-size:.8rem; color:var(--text); display:block}
+  .step .d{font-size:.69rem; color:var(--muted); line-height:1.4; display:block}
+  .step .v{font-family:var(--mono); font-size:.82rem; text-align:right; white-space:nowrap; color:var(--text); flex:none}
   .step.hide{display:none}
   .step.plus .v{color:var(--pos)}
   .step.eq{border-top:1px dashed var(--line); padding-top:10px; margin-top:2px}
 
   .final{margin-top:10px; border-top:1px dashed var(--line); padding-top:12px; display:flex; justify-content:space-between; align-items:baseline; gap:10px}
-  .final .k{font-family:var(--disp); font-size:.72rem; text-transform:uppercase; letter-spacing:.09em; color:var(--text); font-weight:600}
+  .final .k{font-family:var(--disp); font-size:.7rem; text-transform:uppercase; letter-spacing:.08em; color:var(--text); font-weight:600; flex:1 1 auto; min-width:0}
   .final .k small{display:block; text-transform:none; letter-spacing:0; color:var(--muted); font-size:.68rem; font-weight:400; margin-top:2px}
-  .final .v{font-family:var(--mono); text-align:right}
-  .final .v .bs{color:var(--gold); font-weight:600; font-size:1.35rem; display:block; line-height:1.1}
-  .final .v .usd{color:var(--gold-dim); font-size:.82rem}
+  .final .v{font-family:var(--mono); text-align:right; flex:none}
+  .final .v .bs{color:var(--gold); font-weight:600; font-size:1.3rem; display:block; line-height:1.15}
+  .final .v .usd{color:var(--gold-dim); font-size:.8rem}
+  .totalrow{display:flex; justify-content:space-between; align-items:baseline; gap:10px; margin-top:9px; padding-top:9px; border-top:1px solid var(--line)}
+  .totalrow .k{font-size:.78rem; color:var(--muted); flex:1 1 auto; min-width:0}
+  .totalrow .v{font-family:var(--mono); font-size:.88rem; text-align:right; flex:none}
+  .totalrow .v .bs{color:var(--text); display:block}
+  .totalrow .v .usd{color:var(--muted); font-size:.75rem}
 
-  .vhead{display:flex; justify-content:space-between; align-items:flex-start; gap:12px}
-  .pname{font-family:var(--disp); font-size:1.08rem; font-weight:600; margin:0}
-  .pmeta{font-family:var(--mono); font-size:.75rem; color:var(--muted); margin:4px 0 0; line-height:1.5}
-  .erosion{margin-top:11px; border-radius:10px; border:1px solid rgba(224,163,62,.4); background:rgba(224,163,62,.08);
-    padding:10px 11px; font-size:.76rem; line-height:1.55; display:none}
-  .erosion.show{display:block}
-  .erosion b{color:var(--warn)}
-  .erosion .cmp{font-family:var(--mono); margin-top:5px; color:var(--muted)}
-  .erosion .cmp s{color:#6C7789}
+  .vhead .pname{font-family:var(--disp); font-size:1.05rem; font-weight:600; margin:0; word-break:break-word}
+  .vhead .pmeta{font-family:var(--mono); font-size:.73rem; color:var(--muted); margin:4px 0 0; line-height:1.55}
+
+  /* aviso de cambio de tasa */
+  .rc{margin-top:12px; border-radius:11px; padding:11px 12px; font-size:.77rem; line-height:1.55;
+    border:1px solid rgba(224,163,62,.4); background:rgba(224,163,62,.08); display:none}
+  .rc.show{display:block}
+  .rc.down{border-color:rgba(89,195,155,.35); background:rgba(89,195,155,.07)}
+  .rc b{color:var(--warn)}
+  .rc.down b{color:var(--pos)}
+  .rc .cmp{font-family:var(--mono); margin-top:6px; color:var(--muted); font-size:.75rem; line-height:1.6}
+  .rc .cmp .now{color:var(--text)}
+  .rc .act{display:block; width:100%; margin-top:10px; text-align:center; padding:10px; border-radius:10px;
+    font-size:.82rem; font-weight:600; background:var(--gold); color:#1a1305}
+  .rc .act:active{transform:scale(.98)}
 
   .warnmsg{color:var(--danger); font-size:.78rem; margin:10px 0 0; display:none}
   .warnmsg.show{display:block}
   .btnrow{display:flex; gap:8px; margin-top:12px}
-  .btn{flex:1; text-align:center; padding:11px; border-radius:11px; font-size:.9rem; font-weight:600}
+  .btn{flex:1 1 0; min-width:0; text-align:center; padding:12px 8px; border-radius:11px; font-size:.88rem; font-weight:600}
   .btn:active{transform:scale(.98)}
   .btn-primary{background:var(--gold); color:#1a1305}
   .btn-ghost{border:1px solid var(--line); background:var(--surface-2); color:var(--text)}
   .btn-danger{border:1px solid rgba(228,105,91,.4); color:var(--danger); background:transparent}
 
-  .empty{text-align:center; color:var(--muted); padding:34px 16px; border:1px dashed var(--line); border-radius:14px; font-size:.9rem}
-  footer{margin-top:26px; padding-top:16px; border-top:1px solid var(--line); font-size:.72rem; color:var(--muted); line-height:1.6}
+  .empty{text-align:center; color:var(--muted); padding:32px 16px; border:1px dashed var(--line); border-radius:14px; font-size:.88rem}
+  footer{margin-top:24px; padding-top:16px; border-top:1px solid var(--line); font-size:.71rem; color:var(--muted); line-height:1.6}
   footer a{color:var(--gold-dim)}
 </style>
 </head>
@@ -187,33 +197,32 @@
   <div class="body">
     Cada producto sigue estos pasos, en este orden:
     <ol>
-      <li>Partimos del <b>monto total</b> que pagaste por el lote (lo escribes en Bs o en $; la app convierte con la tasa del BCV del día).</li>
+      <li>Partimos del <b>costo de una unidad</b> (lo escribes en Bs o en $; la app convierte con la tasa del BCV).</li>
       <li>Si el producto <b>lleva IVA</b>, se le suma ese porcentaje.</li>
-      <li>Se le suma tu <b>margen de ganancia</b> (puedes cambiarlo producto por producto: no a todo se le gana igual).</li>
-      <li>Eso da el <b>subtotal</b>, que se <b>divide entre la cantidad</b> de unidades → valor unitario.</li>
-      <li>Opcional: le sumas un <b>colchón fijo en Bs</b> por unidad, para protegerte de que el dólar suba.</li>
+      <li>Se le suma tu <b>margen de ganancia</b>, que puedes cambiar producto por producto.</li>
+      <li>Opcional: le sumas un <b>colchón fijo en Bs</b>, para protegerte de que el dólar suba.</li>
+      <li>Eso da el <b>precio final por unidad</b>. Si pones cantidad, se <b>multiplica</b> para mostrarte el total que tienes.</li>
     </ol>
-    <div style="margin-top:9px">El resultado es el <b>precio final por unidad</b>, que verás en Bs y su equivalente en $.</div>
+    <div style="margin-top:9px">Si cargaste el costo <b>en Bs</b> y el dólar cambia, la app te avisa debajo del producto y te ofrece actualizarlo.</div>
   </div>
 </details>
 
 <div class="settings">
-  <div class="field"><label for="ivaInput">IVA %</label>
+  <div><label for="ivaInput">IVA %</label>
     <input id="ivaInput" class="num" type="number" inputmode="decimal" step="0.1" value="16" />
-    <div class="hint">Se aplica solo a los productos que marques con IVA.</div></div>
-  <div class="field"><label for="ganInput">Ganancia % por defecto</label>
+    <div class="hint">Solo para los productos marcados con IVA.</div></div>
+  <div><label for="ganInput">Ganancia % por defecto</label>
     <input id="ganInput" class="num" type="number" inputmode="decimal" step="1" value="40" />
-    <div class="hint">Valor sugerido al crear. Cada producto puede tener el suyo.</div></div>
+    <div class="hint">Sugerida al crear. Cada producto lleva la suya.</div></div>
 </div>
 
 <div class="sec"><h2>Productos</h2><button class="add" id="addBtn">+ Agregar</button></div>
 <div id="list"></div>
 
 <footer>
-  Fórmula: (Monto + IVA + Ganancia) ÷ cantidad, y opcionalmente + colchón en Bs por unidad.
+  Fórmula por unidad: Costo + IVA + Ganancia + colchón opcional = precio final. La cantidad multiplica para darte el total.
   Tasa BCV vía <a href="https://ve.dolarapi.com/v1/dolares/oficial" target="_blank" rel="noopener">DolarAPI</a> (referencial).
-  Al guardar cada producto se anota la tasa del momento para avisarte si el dólar se come tu ganancia.
-  Todo se guarda en este dispositivo.
+  Al guardar se anota la tasa del momento para avisarte cuando el dólar cambie. Todo se guarda en este dispositivo.
 </footer>
 
 <script>
@@ -226,7 +235,7 @@ const fmt = new Intl.NumberFormat('es-VE',{minimumFractionDigits:2,maximumFracti
 const fmtRate = new Intl.NumberFormat('es-VE',{minimumFractionDigits:2,maximumFractionDigits:4});
 const bs = v => 'Bs ' + fmt.format(v||0);
 const usd = v => '$ ' + fmt.format(v||0);
-const UMBRAL = 5;   // % de pérdida en $ a partir del cual avisamos
+const UMBRAL_TASA = 0.001;   // 0,1% de variación ya dispara el aviso
 
 let rate = 0, fecha = '', fuente = '';
 let products = [];
@@ -234,13 +243,14 @@ let settings = { iva:16, gan:40 };
 
 function safeParse(s){ try{ return JSON.parse(s); }catch(e){ return null; } }
 function loadState(){
+  settings = Object.assign(settings, safeParse(store.get('bcv_settings')) || {});
   products = safeParse(store.get('bcv_products')) || [];
   products.forEach(p=>{
     if(p.saved===undefined) p.saved=true;
-    if(p.gan===undefined || p.gan==='') p.gan = settings.gan;   // migración de productos viejos
-    if(p.colchon===undefined) p.colchon = '';
+    if(p.gan===undefined || p.gan==='') p.gan = settings.gan;
+    if(p.colchon===undefined) p.colchon='';
+    if(p.cant===undefined || p.cant==='' ) p.cant = 1;
   });
-  settings = Object.assign(settings, safeParse(store.get('bcv_settings')) || {});
   const cache = safeParse(store.get('bcv_rate_cache'));
   if(cache){ rate=cache.rate; fecha=cache.fecha; fuente=cache.fuente; }
 }
@@ -251,7 +261,7 @@ function saveProducts(){
 function saveSettings(){ store.set('bcv_settings', JSON.stringify(settings)); }
 
 async function fetchRate(manual){
-  const btn = document.getElementById('refreshBtn'), dot = document.getElementById('statusDot');
+  const btn=document.getElementById('refreshBtn'), dot=document.getElementById('statusDot');
   if(manual) btn.classList.add('spin');
   try{
     const r = await fetch('https://ve.dolarapi.com/v1/dolares/oficial', {cache:'no-store'});
@@ -259,9 +269,9 @@ async function fetchRate(manual){
     const d = await r.json();
     const val = d.promedio ?? d.venta ?? d.compra;
     if(!val) throw new Error('sin valor');
-    rate = Number(val);
-    fecha = d.fechaActualizacion || new Date().toISOString();
-    fuente = 'DolarAPI';
+    rate=Number(val);
+    fecha=d.fechaActualizacion || new Date().toISOString();
+    fuente='DolarAPI';
     store.set('bcv_rate_cache', JSON.stringify({rate,fecha,fuente}));
     dot.className='dot live'; renderRate(); renderList();
   }catch(err){
@@ -273,50 +283,50 @@ async function fetchRate(manual){
 function renderRate(){
   document.getElementById('rateVal').textContent = rate ? fmtRate.format(rate) : '—';
   document.getElementById('fuente').textContent = fuente || '—';
-  const f = document.getElementById('fecha');
+  const f=document.getElementById('fecha');
   if(fecha){ const dt=new Date(fecha);
     f.textContent = !isNaN(dt) ? 'Actualizado '+dt.toLocaleString('es-VE',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}) : 'Última tasa conocida';
-  } else { f.textContent='Sin datos aún'; }
+  } else f.textContent='Sin datos aún';
 }
 
-/* ---------- FÓRMULA ----------
-   1) monto (Bs o $ → convertido con tasa BCV)
+/* ---------- FÓRMULA (por unidad) ----------
+   1) costo de UNA unidad (Bs o $ → tasa BCV)
    2) + IVA% (si aplica)
-   3) + Ganancia% (propia de cada producto)
-   4) = subtotal ÷ cantidad = unitario base
-   5) + colchón fijo en Bs por unidad
-   = precio final por unidad                                   */
+   3) + Ganancia% (propia del producto)
+   4) + colchón fijo en Bs
+   = precio final por unidad
+   × cantidad = total que tienes                              */
 function ganDe(p){ return (p.gan===''||p.gan==null) ? (Number(settings.gan)||0) : (Number(p.gan)||0); }
+function cantDe(p){ const n=Number(p.cant); return (!n||n<1)?1:n; }
 function compute(p){
-  const monto=Number(p.monto)||0, cant=Number(p.cant)||0;
-  let montoBs, montoUSD;
-  if(p.cur==='usd'){ montoUSD=monto; montoBs=rate?monto*rate:0; }
-  else { montoBs=monto; montoUSD=rate?monto/rate:0; }
+  const monto=Number(p.monto)||0;
+  let costoBs, costoUSD;
+  if(p.cur==='usd'){ costoUSD=monto; costoBs=rate?monto*rate:0; }
+  else { costoBs=monto; costoUSD=rate?monto/rate:0; }
   const ivaF = p.iva ? (Number(settings.iva)||0)/100 : 0;
   const ganF = ganDe(p)/100;
-  const ivaBs=montoBs*ivaF, ganBs=montoBs*ganF;
-  const subBs=montoBs*(1+ivaF+ganF);
-  const unitBase = cant>0 ? subBs/cant : 0;
+  const ivaBs=costoBs*ivaF, ganBs=costoBs*ganF;
+  const preColch = costoBs*(1+ivaF+ganF);
   const colch = Number(p.colchon)||0;
-  const unitBs = unitBase + colch;
+  const unitBs = preColch + colch;
   const unitUSD = rate ? unitBs/rate : 0;
-  return {montoBs,montoUSD,ivaBs,ganBs,subBs,unitBase,colch,unitBs,unitUSD,cant,
-          subUSD: rate?subBs/rate:0, ivaUSD: rate?ivaBs/rate:0, ganUSD: rate?ganBs/rate:0};
+  const cant = cantDe(p);
+  const totalBs = unitBs*cant, totalUSD = rate ? totalBs/rate : 0;
+  return {costoBs,costoUSD,ivaBs,ganBs,preColch,colch,unitBs,unitUSD,cant,totalBs,totalUSD};
 }
 
-/* erosión: compara el valor en $ del precio unitario de hoy contra el del día que lo guardaste */
-function erosion(p){
-  if(!p.snap || !p.snap.rate || !rate || !p.snap.unitUSD) return null;
-  const c = compute(p);
-  const hoyUSD = c.unitUSD;
-  if(!hoyUSD) return null;
-  const perdPct = (1 - hoyUSD/p.snap.unitUSD)*100;
-  if(perdPct < UMBRAL) return null;
-  const subeTasa = (rate/p.snap.rate - 1)*100;
-  return { perdPct, subeTasa, antesUSD:p.snap.unitUSD, hoyUSD, fecha:p.snap.ts };
+/* cambio de tasa desde que se guardó (solo productos cargados en Bs) */
+function cambioTasa(p){
+  if(p.cur!=='bs' || !p.saved || !p.snap || !p.snap.rate || !rate) return null;
+  const diff = (rate - p.snap.rate)/p.snap.rate;
+  if(Math.abs(diff) < UMBRAL_TASA) return null;
+  const montoUSDsave = p.snap.costoUSD || ((Number(p.monto)||0)/p.snap.rate);
+  const nuevoMontoBs = montoUSDsave * rate;
+  return { subio: diff>0, pct: Math.abs(diff*100), tasaAntes:p.snap.rate, tasaHoy:rate,
+           montoUSD:montoUSDsave, montoAntes:Number(p.monto)||0, nuevoMontoBs, ts:p.snap.ts };
 }
 
-const list = document.getElementById('list');
+const list=document.getElementById('list');
 function escapeHtml(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 function escapeAttr(s){ return String(s).replace(/"/g,'&quot;').replace(/</g,'&lt;'); }
 
@@ -326,54 +336,71 @@ function renderList(){
     list.innerHTML='<div class="empty">Aún no hay productos. Toca <b style="color:var(--gold)">+ Agregar</b> para crear el primero.</div>';
     renderAlertaGlobal(); return;
   }
-  products.forEach(p => list.appendChild(buildCard(p)));
+  products.forEach(p=>list.appendChild(buildCard(p)));
   renderAlertaGlobal();
 }
 function renderAlertaGlobal(){
   const box=document.getElementById('alertaGlobal');
-  const afectados = products.filter(p=>p.saved && erosion(p));
-  if(afectados.length===0){ box.classList.remove('show'); box.innerHTML=''; return; }
-  const n=afectados.length;
-  box.innerHTML = `⚠️ <b>El dólar se está comiendo tu ganancia.</b> ${n} producto${n>1?'s':''} ${n>1?'valen':'vale'} hoy menos en $ que cuando ${n>1?'los':'lo'} cargaste. Revisa ${n>1?'los marcados abajo':'el marcado abajo'}: actualiza el monto o súbele el colchón.`;
+  const afect = products.filter(p=>{ const ct=cambioTasa(p); return ct && ct.subio; });
+  if(afect.length===0){ box.classList.remove('show'); box.innerHTML=''; return; }
+  const n=afect.length;
+  box.innerHTML = `⚠️ <b>El dólar subió desde que cargaste ${n>1?'estos productos':'este producto'}.</b> ${n} producto${n>1?'s':''} cargado${n>1?'s':''} en Bs ${n>1?'están':'está'} quedando por debajo de su costo de reposición. Abajo te digo a cuánto ${n>1?'deberían':'debería'} estar.`;
   box.classList.add('show');
 }
 function replaceCard(node,p){ const n=buildCard(p); node.replaceWith(n); return n; }
 function buildCard(p){
   const card=document.createElement('div');
-  card.className='card' + (p.saved?' saved':'');
+  card.className='card'+(p.saved?' saved':'');
   if(p.saved) renderView(card,p); else renderEditor(card,p);
   return card;
 }
 
 /* ---------- VISTA ---------- */
 function renderView(card,p){
-  const c=compute(p), er=erosion(p);
-  if(er) card.classList.add('alert');
-  const montoTxt = p.cur==='usd' ? usd(Number(p.monto)||0) : bs(Number(p.monto)||0);
+  const c=compute(p), ct=cambioTasa(p);
+  if(ct && ct.subio) card.classList.add('alert');
+  const costoTxt = p.cur==='usd' ? usd(Number(p.monto)||0) : bs(Number(p.monto)||0);
   const colchTxt = c.colch>0 ? ` · colchón +${bs(c.colch)}` : '';
-  card.innerHTML = `
+  card.innerHTML=`
     <div class="vhead">
-      <div>
-        <p class="pname">${escapeHtml(p.name||'Sin nombre')}</p>
-        <p class="pmeta">Monto ${montoTxt} · ${Number(p.cant)||0} u. · ${p.iva?'con IVA':'sin IVA'} · ganancia ${ganDe(p)}%${colchTxt}</p>
-      </div>
+      <p class="pname">${escapeHtml(p.name||'Sin nombre')}</p>
+      <p class="pmeta">Costo unidad ${costoTxt} · ${p.iva?'con IVA':'sin IVA'} · ganancia ${ganDe(p)}%${colchTxt}</p>
     </div>
     <div class="final">
       <span class="k">Precio final<small>por unidad</small></span>
       <span class="v"><span class="bs" data-o="unitbs">—</span><span class="usd" data-o="unitusd">—</span></span>
     </div>
-    <div class="erosion ${er?'show':''}" data-eros></div>
+    <div class="totalrow">
+      <span class="k">Total por <span data-o="cant">1</span> unidad<span data-o="plural"></span></span>
+      <span class="v"><span class="bs" data-o="totalbs">—</span><span class="usd" data-o="totalusd">—</span></span>
+    </div>
+    <div class="rc ${ct?'show':''} ${ct&&!ct.subio?'down':''}" data-rc></div>
     <div class="btnrow">
       <button class="btn btn-ghost editbtn">Editar</button>
       <button class="btn btn-danger delbtn">Eliminar</button>
     </div>`;
-  card.querySelector('[data-o="unitbs"]').textContent = bs(c.unitBs);
-  card.querySelector('[data-o="unitusd"]').textContent = usd(c.unitUSD);
-  if(er){
-    const d=new Date(er.fecha), fecha = !isNaN(d)? d.toLocaleDateString('es-VE',{day:'2-digit',month:'short'}) : '';
-    card.querySelector('[data-eros]').innerHTML =
-      `⚠️ <b>Perdiste ${er.perdPct.toFixed(1)}% de ganancia en $.</b> El dólar subió ${er.subeTasa.toFixed(1)}% desde que lo cargaste${fecha?' el '+fecha:''}.
-       <div class="cmp">Antes: <s>${usd(er.antesUSD)}</s> por unidad → Hoy: ${usd(er.hoyUSD)}</div>`;
+  const q=s=>card.querySelector(`[data-o="${s}"]`);
+  q('unitbs').textContent=bs(c.unitBs); q('unitusd').textContent=usd(c.unitUSD);
+  q('cant').textContent=c.cant; q('plural').textContent = c.cant===1?'':'es';
+  q('totalbs').textContent=bs(c.totalBs); q('totalusd').textContent=usd(c.totalUSD);
+
+  if(ct){
+    const d=new Date(ct.ts), f=!isNaN(d)?d.toLocaleDateString('es-VE',{day:'2-digit',month:'short'}):'';
+    const verbo = ct.subio ? 'subió' : 'bajó';
+    card.querySelector('[data-rc]').innerHTML=`
+      ${ct.subio?'⚠️':'ℹ️'} <b>La tasa del dólar cambió.</b> Cargaste este producto${f?' el '+f:''} con el dólar a
+      ${fmtRate.format(ct.tasaAntes)} y hoy ${verbo} a ${fmtRate.format(ct.tasaHoy)} (${ct.pct.toFixed(1)}%).
+      <div class="cmp">
+        Costo cargado: ${bs(ct.montoAntes)} = ${usd(ct.montoUSD)}<br>
+        Esos ${usd(ct.montoUSD)} hoy son: <span class="now">${bs(ct.nuevoMontoBs)}</span>
+      </div>
+      <button class="act">Actualizar costo a ${bs(ct.nuevoMontoBs)}</button>`;
+    card.querySelector('.act').addEventListener('click', ()=>{
+      p.monto = Number(ct.nuevoMontoBs.toFixed(2));
+      const nc = compute(p);
+      p.snap = { rate, costoBs:nc.costoBs, costoUSD:nc.costoUSD, unitBs:nc.unitBs, unitUSD:nc.unitUSD, ts:new Date().toISOString() };
+      saveProducts(); replaceCard(card,p); renderAlertaGlobal();
+    });
   }
   card.querySelector('.editbtn').addEventListener('click', ()=>{
     p._backup = JSON.parse(JSON.stringify((()=>{const o={};for(const k in p){if(!k.startsWith('_'))o[k]=p[k];}return o;})()));
@@ -385,36 +412,33 @@ function renderView(card,p){
 }
 
 /* ---------- EDITOR ---------- */
-const GAN_CHIPS = [20,30,40,50];
-const COLCH_CHIPS = [10,20,30];
+const GAN_CHIPS=[20,30,40,50], COLCH_CHIPS=[10,20,30];
 function renderEditor(card,p){
   if(!p.cur) p.cur='bs';
-  const colchOpen = (Number(p.colchon)||0) > 0;
-  card.innerHTML = `
+  const colchOpen=(Number(p.colchon)||0)>0;
+  card.innerHTML=`
     <div class="block"><label>1 · Producto</label>
       <input data-f="name" type="text" placeholder="Nombre" value="${escapeAttr(p.name||'')}" /></div>
 
-    <div class="block"><label>2 · Monto total del lote</label>
+    <div class="block"><label>2 · Costo de una unidad</label>
       <div class="montoline">
         <input data-f="monto" class="num" type="number" inputmode="decimal" step="0.01" placeholder="0,00" value="${p.monto ?? ''}" />
         <div class="curtoggle"><button data-cur="bs">Bs</button><button data-cur="usd">$</button></div>
       </div>
       <div class="equiv" data-o="equiv">—</div>
-      <div class="hint">Lo que pagaste por todo el lote. Escríbelo en la moneda que quieras: la app convierte con la tasa del BCV.</div></div>
+      <div class="hint">Lo que te cuesta <b>una sola unidad</b>. Escríbelo en Bs o en $: la app convierte con la tasa del BCV.</div></div>
 
-    <div class="grid2 block">
-      <div><label>3 · Cantidad</label>
-        <input data-f="cant" class="num" type="number" inputmode="numeric" step="1" placeholder="0" value="${p.cant ?? ''}" />
-        <div class="hint">Unidades del lote.</div></div>
+    <div class="duo block">
+      <div><label>3 · Cantidad que tienes</label>
+        <input data-f="cant" class="num" type="number" inputmode="numeric" step="1" placeholder="1" value="${p.cant ?? 1}" />
+        <div class="hint">Solo multiplica para darte el total. No afecta el precio unitario.</div></div>
       <div><label>4 · Impuesto</label>
         <label class="ivatoggle"><input data-f="iva" type="checkbox" ${p.iva?'checked':''}/><small>¿Lleva IVA?</small></label>
         <div class="hint">Márcalo solo si el producto es gravado.</div></div>
     </div>
 
     <div class="block"><label>5 · Margen de ganancia</label>
-      <div class="chips" data-ganchips>
-        ${GAN_CHIPS.map(v=>`<button class="chip" data-gan="${v}">${v}%</button>`).join('')}
-      </div>
+      <div class="chips" data-ganchips>${GAN_CHIPS.map(v=>`<button class="chip" data-gan="${v}">${v}%</button>`).join('')}</div>
       <input data-f="gan" class="num" type="number" inputmode="decimal" step="1" placeholder="40" value="${p.gan ?? ''}" />
       <div class="hint">Toca un atajo o escribe el que quieras. Súbelo si tiene poca competencia, bájalo si hay mucha.</div></div>
 
@@ -429,48 +453,49 @@ function renderEditor(card,p){
           <button class="chip" data-colch="0">Ninguno</button>
         </div>
         <input data-f="colchon" class="num" type="number" inputmode="decimal" step="0.01" placeholder="0,00" value="${p.colchon ?? ''}" />
-        <div class="hint">Bs fijos que se suman <b>a cada unidad</b> al final, después de todo el cálculo. Es tu colchón por si el dólar sube antes de vender.</div>
+        <div class="hint">Bs fijos que se suman <b>a cada unidad</b> al final. Tu colchón por si el dólar sube antes de vender.</div>
       </div>
     </div>
 
     <div class="steps">
-      <div class="step"><span class="n">1</span><span class="txt"><span class="k">Monto total</span><span class="d">lo que pagaste por el lote</span></span><span class="v" data-o="monto">—</span></div>
-      <div class="step plus" data-ivarow><span class="n">2</span><span class="txt"><span class="k">+ IVA <span data-o="ivapct"></span></span><span class="d">sobre el monto total</span></span><span class="v" data-o="iva">—</span></div>
-      <div class="step plus"><span class="n">3</span><span class="txt"><span class="k">+ Ganancia <span data-o="ganpct"></span></span><span class="d">sobre el monto total</span></span><span class="v" data-o="gan">—</span></div>
-      <div class="step eq"><span class="n">=</span><span class="txt"><span class="k">Subtotal del lote</span></span><span class="v" data-o="sub">—</span></div>
-      <div class="step"><span class="n">÷</span><span class="txt"><span class="k">Entre <span data-o="cant">0</span> unidades</span></span><span class="v" data-o="unitbase">—</span></div>
-      <div class="step plus" data-colchrow><span class="n">+</span><span class="txt"><span class="k">Colchón por unidad</span><span class="d">protección contra el dólar</span></span><span class="v" data-o="colch">—</span></div>
+      <div class="step"><span class="n">1</span><span class="txt"><span class="k">Costo de la unidad</span><span class="d">lo que te cuesta a ti</span></span><span class="v" data-o="costo">—</span></div>
+      <div class="step plus" data-ivarow><span class="n">2</span><span class="txt"><span class="k">+ IVA <span data-o="ivapct"></span></span><span class="d">sobre el costo</span></span><span class="v" data-o="iva">—</span></div>
+      <div class="step plus"><span class="n">3</span><span class="txt"><span class="k">+ Ganancia <span data-o="ganpct"></span></span><span class="d">sobre el costo</span></span><span class="v" data-o="gan">—</span></div>
+      <div class="step plus" data-colchrow><span class="n">4</span><span class="txt"><span class="k">+ Colchón</span><span class="d">protección contra el dólar</span></span><span class="v" data-o="colch">—</span></div>
       <div class="final">
         <span class="k">Precio final<small>por unidad</small></span>
         <span class="v"><span class="bs" data-o="unitbs">—</span><span class="usd" data-o="unitusd">—</span></span>
       </div>
+      <div class="totalrow">
+        <span class="k">× <span data-o="cant">1</span> unidad<span data-o="plural"></span> = total</span>
+        <span class="v"><span class="bs" data-o="totalbs">—</span><span class="usd" data-o="totalusd">—</span></span>
+      </div>
     </div>
 
-    <div class="warnmsg" data-warn>Completa el monto y la cantidad para poder guardar.</div>
+    <div class="warnmsg" data-warn>Escribe el costo de la unidad para poder guardar.</div>
     <div class="btnrow">
       <button class="btn btn-primary savebtn">✓ Guardar</button>
       <button class="btn btn-ghost cancelbtn">Cancelar</button>
     </div>`;
 
-  const curBtns = card.querySelectorAll('.curtoggle button');
-  const setCur = ()=>curBtns.forEach(b=>b.classList.toggle('on', b.dataset.cur===p.cur));
+  const curBtns=card.querySelectorAll('.curtoggle button');
+  const setCur=()=>curBtns.forEach(b=>b.classList.toggle('on', b.dataset.cur===p.cur));
   setCur();
   curBtns.forEach(b=>b.addEventListener('click', ()=>{ p.cur=b.dataset.cur; setCur(); saveProducts(); recalcCard(card,p); }));
 
-  const ganChips = card.querySelectorAll('[data-ganchips] .chip');
-  const syncGan = ()=>ganChips.forEach(b=>b.classList.toggle('on', Number(b.dataset.gan)===Number(p.gan)));
+  const ganChips=card.querySelectorAll('[data-ganchips] .chip');
+  const syncGan=()=>ganChips.forEach(b=>b.classList.toggle('on', Number(b.dataset.gan)===Number(p.gan)));
   syncGan();
   ganChips.forEach(b=>b.addEventListener('click', ()=>{
-    p.gan = Number(b.dataset.gan);
-    card.querySelector('[data-f="gan"]').value = p.gan;
+    p.gan=Number(b.dataset.gan); card.querySelector('[data-f="gan"]').value=p.gan;
     syncGan(); saveProducts(); recalcCard(card,p);
   }));
 
-  const colchBox = card.querySelector('[data-colch]');
-  const colchChips = card.querySelectorAll('[data-colchchips] .chip');
-  const colchInput = card.querySelector('[data-f="colchon"]');
-  const syncColch = ()=>{
-    const v = Number(p.colchon)||0;
+  const colchBox=card.querySelector('[data-colch]');
+  const colchChips=card.querySelectorAll('[data-colchchips] .chip');
+  const colchInput=card.querySelector('[data-f="colchon"]');
+  const syncColch=()=>{
+    const v=Number(p.colchon)||0;
     colchChips.forEach(b=>b.classList.toggle('on', Number(b.dataset.colch)===v));
     colchBox.classList.toggle('on', v>0);
     card.querySelector('[data-colchst]').textContent = v>0 ? '+ '+bs(v) : 'Opcional';
@@ -479,15 +504,14 @@ function renderEditor(card,p){
   card.querySelector('[data-colchhead]').addEventListener('click', ()=>colchBox.classList.toggle('closed'));
   colchChips.forEach(b=>b.addEventListener('click', ()=>{
     const v=Number(b.dataset.colch);
-    p.colchon = v===0 ? '' : v;
-    colchInput.value = p.colchon;
+    p.colchon = v===0?'':v; colchInput.value=p.colchon;
     syncColch(); saveProducts(); recalcCard(card,p);
   }));
 
   card.querySelectorAll('input[data-f]').forEach(inp=>{
     const f=inp.dataset.f, ev=inp.type==='checkbox'?'change':'input';
     inp.addEventListener(ev, ()=>{
-      p[f] = inp.type==='checkbox'?inp.checked:inp.value;
+      p[f]= inp.type==='checkbox'?inp.checked:inp.value;
       inp.classList.remove('err');
       if(f==='iva'){ const ivt=card.querySelector('.ivatoggle'); if(ivt) ivt.classList.toggle('active', inp.checked); }
       if(f==='gan') syncGan();
@@ -498,23 +522,21 @@ function renderEditor(card,p){
   const ivt=card.querySelector('.ivatoggle'); if(ivt) ivt.classList.toggle('active', !!p.iva);
 
   card.querySelector('.savebtn').addEventListener('click', ()=>{
-    const montoOk=(Number(p.monto)||0)>0, cantOk=(Number(p.cant)||0)>0;
-    if(!montoOk || !cantOk){
+    if(!((Number(p.monto)||0)>0)){
       card.querySelector('[data-warn]').classList.add('show');
-      if(!montoOk) card.querySelector('[data-f="monto"]').classList.add('err');
-      if(!cantOk) card.querySelector('[data-f="cant"]').classList.add('err');
+      card.querySelector('[data-f="monto"]').classList.add('err');
       return;
     }
+    if(!(Number(p.cant)>0)) p.cant=1;
     const c=compute(p);
-    if(rate) p.snap = { rate, unitBs:c.unitBs, unitUSD:c.unitUSD, ts:new Date().toISOString() };
+    if(rate) p.snap={ rate, costoBs:c.costoBs, costoUSD:c.costoUSD, unitBs:c.unitBs, unitUSD:c.unitUSD, ts:new Date().toISOString() };
     p.saved=true; delete p._new; delete p._backup; saveProducts(); replaceCard(card,p); renderAlertaGlobal();
   });
   card.querySelector('.cancelbtn').addEventListener('click', ()=>{
     if(p._new){ products=products.filter(x=>x!==p); saveProducts(); renderList(); return; }
-    if(p._backup){ for(const k in p){ if(!k.startsWith('_')) delete p[k]; } Object.assign(p, p._backup); }
+    if(p._backup){ for(const k in p){ if(!k.startsWith('_')) delete p[k]; } Object.assign(p,p._backup); }
     p.saved=true; delete p._new; delete p._backup; saveProducts(); replaceCard(card,p); renderAlertaGlobal();
   });
-
   recalcCard(card,p);
 }
 
@@ -524,31 +546,31 @@ function recalcCard(card,p){
   const eq=q('equiv');
   if(eq){
     if(!rate) eq.textContent='Esperando tasa del BCV…';
-    else if(p.cur==='usd') eq.textContent='= '+bs(c.montoBs)+' a la tasa de hoy';
-    else eq.textContent='= '+usd(c.montoUSD)+' a la tasa de hoy';
+    else if(p.cur==='usd') eq.textContent='= '+bs(c.costoBs)+' a la tasa de hoy';
+    else eq.textContent='= '+usd(c.costoUSD)+' a la tasa de hoy';
   }
-  set('monto', bs(c.montoBs));
+  set('costo', bs(c.costoBs));
   set('ivapct', (Number(settings.iva)||0)+'%');
   set('ganpct', ganDe(p)+'%');
   set('iva', bs(c.ivaBs));
   set('gan', bs(c.ganBs));
-  set('sub', bs(c.subBs));
-  set('cant', c.cant||0);
-  set('unitbase', bs(c.unitBase));
   set('colch', bs(c.colch));
   set('unitbs', bs(c.unitBs));
   set('unitusd', usd(c.unitUSD));
+  set('cant', c.cant);
+  set('plural', c.cant===1?'':'es');
+  set('totalbs', bs(c.totalBs));
+  set('totalusd', usd(c.totalUSD));
   const ivarow=card.querySelector('[data-ivarow]'); if(ivarow) ivarow.classList.toggle('hide', !p.iva);
   const colchrow=card.querySelector('[data-colchrow]'); if(colchrow) colchrow.classList.toggle('hide', !(c.colch>0));
 }
 function recalcAll(){ renderList(); }
 
 document.getElementById('addBtn').addEventListener('click', ()=>{
-  const p={ id:Date.now(), name:'', monto:'', cur:'bs', cant:'', iva:true,
+  const p={ id:Date.now(), name:'', monto:'', cur:'bs', cant:1, iva:true,
             gan:Number(settings.gan)||40, colchon:'', saved:false, _new:true };
   products.push(p); saveProducts();
-  if(products.length===1) renderList();
-  else list.appendChild(buildCard(p));
+  if(products.length===1) renderList(); else list.appendChild(buildCard(p));
   const cards=list.querySelectorAll('.card'), last=cards[cards.length-1];
   if(last){ last.scrollIntoView({behavior:'smooth',block:'center'}); const fi=last.querySelector('input'); if(fi) fi.focus(); }
 });
