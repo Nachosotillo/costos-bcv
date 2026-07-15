@@ -470,10 +470,13 @@ function cargarCache(){
 }
 
 /* ---------- tasa BCV ---------- */
-// ?_=<timestamp> obliga a que sea una URL nueva: ni el navegador ni ningún
-// proxy intermedio pueden devolver una respuesta guardada de antes.
-const sinCache = u => fetch(u + (u.includes('?')?'&':'?') + '_=' + Date.now(),
-  { cache:'no-store', headers:{ 'Cache-Control':'no-cache', 'Pragma':'no-cache' } });
+// ?_=<timestamp> ya rompe el caché por sí solo: cada llamada es una URL distinta,
+// así que no hay respuesta vieja que devolver.
+// OJO: NO agregar headers como Cache-Control o Pragma. No están en la lista segura
+// de CORS, obligan al navegador a mandar un preflight OPTIONS, y DolarAPI no lo
+// responde -> el dólar y el euro fallan. cache:'no-store' es opción de fetch,
+// no header, y no dispara preflight.
+const sinCache = u => fetch(u + (u.includes('?')?'&':'?') + '_=' + Date.now(), { cache:'no-store' });
 
 async function fetchRate(manual){
   const btn=document.getElementById('refreshBtn'), dot=document.getElementById('statusDot');
