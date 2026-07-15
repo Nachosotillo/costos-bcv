@@ -17,7 +17,7 @@
   :root{
     --ink:#12161F; --surface:#1A2130; --surface-2:#222B3D; --line:#2C3547;
     --text:#ECEFF4; --muted:#8B96AC; --gold:#E7B15A; --gold-dim:#A9843F;
-    --pos:#59C39B; --danger:#E4695B;
+    --pos:#59C39B; --danger:#E4695B; --warn:#E0A33E;
     --mono:'IBM Plex Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
     --disp:'Space Grotesk',system-ui,sans-serif;
     --body:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
@@ -25,7 +25,7 @@
   *{box-sizing:border-box}
   html,body{margin:0}
   body{background:var(--ink); color:var(--text); font-family:var(--body);
-    -webkit-font-smoothing:antialiased; line-height:1.4;
+    -webkit-font-smoothing:antialiased; line-height:1.45;
     padding:0 16px calc(40px + env(safe-area-inset-bottom)) 16px; max-width:680px; margin:0 auto;}
   h1{font-family:var(--disp); font-weight:700; font-size:1.05rem; letter-spacing:.02em; margin:0}
   .num{font-family:var(--mono); font-variant-numeric:tabular-nums}
@@ -36,6 +36,7 @@
   input.err{border-color:var(--danger); box-shadow:0 0 0 3px rgba(228,105,91,.15)}
   input::placeholder{color:#5C6779}
   label{display:block; font-size:.7rem; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); margin:0 0 5px 2px}
+  .hint{font-size:.74rem; color:var(--muted); margin:5px 0 0 2px; line-height:1.45}
 
   header{display:flex; align-items:center; gap:10px; padding:20px 2px 14px}
   header .dot{width:9px; height:9px; border-radius:50%; background:var(--muted); flex:none; transition:.3s}
@@ -57,7 +58,24 @@
   .refresh.spin svg{animation:sp 1s linear infinite}
   @keyframes sp{to{transform:rotate(360deg)}}
 
-  .settings{display:flex; gap:10px; margin:14px 0 4px}
+  /* aviso global de erosión */
+  .alerta{display:none; margin-top:12px; border:1px solid rgba(224,163,62,.45); background:rgba(224,163,62,.09);
+    border-radius:13px; padding:13px 14px; font-size:.84rem; line-height:1.5}
+  .alerta.show{display:block}
+  .alerta b{color:var(--warn)}
+
+  /* explicador */
+  details.expl{margin-top:12px; border:1px solid var(--line); background:var(--surface); border-radius:13px; overflow:hidden}
+  details.expl summary{list-style:none; cursor:pointer; padding:12px 14px; font-size:.84rem; font-weight:600; color:var(--gold); display:flex; justify-content:space-between; align-items:center}
+  details.expl summary::-webkit-details-marker{display:none}
+  details.expl summary::after{content:'▾'; color:var(--muted); font-size:.8rem}
+  details.expl[open] summary::after{content:'▴'}
+  details.expl .body{padding:0 14px 14px; font-size:.82rem; color:var(--muted); line-height:1.65}
+  details.expl .body ol{margin:8px 0 0; padding-left:20px}
+  details.expl .body li{margin-bottom:5px}
+  details.expl .body b{color:var(--text); font-weight:600}
+
+  .settings{display:flex; gap:10px; margin:14px 0 0}
   .settings .field{flex:1}
   .sec{display:flex; justify-content:space-between; align-items:center; margin:24px 2px 12px}
   .sec h2{font-family:var(--disp); font-size:.82rem; text-transform:uppercase; letter-spacing:.1em; color:var(--muted); font-weight:600; margin:0}
@@ -66,7 +84,8 @@
 
   .card{background:var(--surface); border:1px solid var(--line); border-radius:14px; padding:14px; margin-bottom:12px}
   .card.saved{border-color:#33405A}
-  .block{margin-bottom:10px}
+  .card.alert{border-color:rgba(224,163,62,.55)}
+  .block{margin-bottom:12px}
   .montoline{display:flex; gap:8px; align-items:stretch}
   .montoline input{flex:1}
   .curtoggle{display:flex; background:var(--surface-2); border:1px solid var(--line); border-radius:10px; overflow:hidden; flex:none}
@@ -79,24 +98,54 @@
   .ivatoggle small{font-size:.82rem; color:var(--muted)}
   .ivatoggle.active small{color:var(--text)}
 
-  .breakdown{margin-top:12px; border-top:1px solid var(--line); padding-top:11px}
-  .breakdown .li{display:flex; justify-content:space-between; align-items:baseline; font-size:.83rem; margin-bottom:6px}
-  .breakdown .li span:first-child{color:var(--muted)}
-  .breakdown .li .num{font-size:.85rem}
-  .breakdown .li.hide{display:none}
-  .unit{margin-top:10px; border-top:1px dashed var(--line); padding-top:11px; display:flex; justify-content:space-between; align-items:baseline; gap:10px}
-  .unit .k{font-family:var(--disp); font-size:.72rem; text-transform:uppercase; letter-spacing:.09em; color:var(--text); font-weight:600}
-  .unit .v{font-family:var(--mono); text-align:right}
-  .unit .v .bs{color:var(--gold); font-weight:600; font-size:1.25rem; display:block; line-height:1.1}
-  .unit .v .usd{color:var(--gold-dim); font-size:.82rem}
+  /* chips */
+  .chips{display:flex; gap:7px; flex-wrap:wrap; margin-bottom:7px}
+  .chip{border:1px solid var(--line); background:var(--surface-2); border-radius:999px; padding:7px 14px;
+    font-family:var(--mono); font-size:.82rem; color:var(--muted)}
+  .chip.on{background:var(--gold); border-color:var(--gold); color:#1a1305; font-weight:600}
+  .chip:active{transform:scale(.96)}
 
-  .vhead{display:flex; justify-content:space-between; align-items:flex-start; gap:12px; margin-bottom:2px}
+  /* colchón desplegable */
+  .colch{border:1px dashed var(--line); border-radius:12px; padding:12px; margin-bottom:12px}
+  .colch.on{border-style:solid; border-color:var(--gold-dim); background:rgba(231,177,90,.05)}
+  .colch .head{display:flex; justify-content:space-between; align-items:center; gap:10px; cursor:pointer}
+  .colch .head .t{font-size:.84rem; font-weight:600; color:var(--gold)}
+  .colch .head .st{font-family:var(--mono); font-size:.78rem; color:var(--muted)}
+  .colch .inner{margin-top:11px}
+  .colch.closed .inner{display:none}
+
+  /* pasos */
+  .steps{margin-top:12px; border-top:1px solid var(--line); padding-top:12px}
+  .step{display:flex; gap:10px; align-items:flex-start; margin-bottom:9px}
+  .step .n{flex:none; width:19px; height:19px; border-radius:50%; background:var(--surface-2); border:1px solid var(--line);
+    font-family:var(--mono); font-size:.62rem; color:var(--muted); display:flex; align-items:center; justify-content:center; margin-top:1px}
+  .step .txt{flex:1; min-width:0}
+  .step .k{font-size:.8rem; color:var(--text)}
+  .step .d{font-size:.7rem; color:var(--muted); line-height:1.4}
+  .step .v{font-family:var(--mono); font-size:.82rem; text-align:right; white-space:nowrap; color:var(--text)}
+  .step.hide{display:none}
+  .step.plus .v{color:var(--pos)}
+  .step.eq{border-top:1px dashed var(--line); padding-top:10px; margin-top:2px}
+
+  .final{margin-top:10px; border-top:1px dashed var(--line); padding-top:12px; display:flex; justify-content:space-between; align-items:baseline; gap:10px}
+  .final .k{font-family:var(--disp); font-size:.72rem; text-transform:uppercase; letter-spacing:.09em; color:var(--text); font-weight:600}
+  .final .k small{display:block; text-transform:none; letter-spacing:0; color:var(--muted); font-size:.68rem; font-weight:400; margin-top:2px}
+  .final .v{font-family:var(--mono); text-align:right}
+  .final .v .bs{color:var(--gold); font-weight:600; font-size:1.35rem; display:block; line-height:1.1}
+  .final .v .usd{color:var(--gold-dim); font-size:.82rem}
+
+  .vhead{display:flex; justify-content:space-between; align-items:flex-start; gap:12px}
   .pname{font-family:var(--disp); font-size:1.08rem; font-weight:600; margin:0}
-  .pmeta{font-family:var(--mono); font-size:.76rem; color:var(--muted); margin:3px 0 0}
-  .badge{font-size:.64rem; text-transform:uppercase; letter-spacing:.08em; padding:3px 9px; border-radius:999px; border:1px solid var(--line); color:var(--muted); white-space:nowrap; flex:none}
+  .pmeta{font-family:var(--mono); font-size:.75rem; color:var(--muted); margin:4px 0 0; line-height:1.5}
+  .erosion{margin-top:11px; border-radius:10px; border:1px solid rgba(224,163,62,.4); background:rgba(224,163,62,.08);
+    padding:10px 11px; font-size:.76rem; line-height:1.55; display:none}
+  .erosion.show{display:block}
+  .erosion b{color:var(--warn)}
+  .erosion .cmp{font-family:var(--mono); margin-top:5px; color:var(--muted)}
+  .erosion .cmp s{color:#6C7789}
 
-  .warn{color:var(--danger); font-size:.78rem; margin:10px 0 0; display:none}
-  .warn.show{display:block}
+  .warnmsg{color:var(--danger); font-size:.78rem; margin:10px 0 0; display:none}
+  .warnmsg.show{display:block}
   .btnrow{display:flex; gap:8px; margin-top:12px}
   .btn{flex:1; text-align:center; padding:11px; border-radius:11px; font-size:.9rem; font-weight:600}
   .btn:active{transform:scale(.98)}
@@ -131,21 +180,40 @@
   </div>
 </section>
 
+<div class="alerta" id="alertaGlobal"></div>
+
+<details class="expl">
+  <summary>¿Cómo se calcula el precio? Toca para ver</summary>
+  <div class="body">
+    Cada producto sigue estos pasos, en este orden:
+    <ol>
+      <li>Partimos del <b>monto total</b> que pagaste por el lote (lo escribes en Bs o en $; la app convierte con la tasa del BCV del día).</li>
+      <li>Si el producto <b>lleva IVA</b>, se le suma ese porcentaje.</li>
+      <li>Se le suma tu <b>margen de ganancia</b> (puedes cambiarlo producto por producto: no a todo se le gana igual).</li>
+      <li>Eso da el <b>subtotal</b>, que se <b>divide entre la cantidad</b> de unidades → valor unitario.</li>
+      <li>Opcional: le sumas un <b>colchón fijo en Bs</b> por unidad, para protegerte de que el dólar suba.</li>
+    </ol>
+    <div style="margin-top:9px">El resultado es el <b>precio final por unidad</b>, que verás en Bs y su equivalente en $.</div>
+  </div>
+</details>
+
 <div class="settings">
   <div class="field"><label for="ivaInput">IVA %</label>
-    <input id="ivaInput" class="num" type="number" inputmode="decimal" step="0.1" value="16" /></div>
-  <div class="field"><label for="ganInput">Ganancia %</label>
-    <input id="ganInput" class="num" type="number" inputmode="decimal" step="1" value="40" /></div>
+    <input id="ivaInput" class="num" type="number" inputmode="decimal" step="0.1" value="16" />
+    <div class="hint">Se aplica solo a los productos que marques con IVA.</div></div>
+  <div class="field"><label for="ganInput">Ganancia % por defecto</label>
+    <input id="ganInput" class="num" type="number" inputmode="decimal" step="1" value="40" />
+    <div class="hint">Valor sugerido al crear. Cada producto puede tener el suyo.</div></div>
 </div>
 
 <div class="sec"><h2>Productos</h2><button class="add" id="addBtn">+ Agregar</button></div>
 <div id="list"></div>
 
 <footer>
-  Fórmula: (Monto total + IVA + Ganancia) ÷ cantidad = valor unitario. Sin IVA se omite el 16%.
-  El monto se escribe en Bs o en $; convierte con la tasa BCV vía
-  <a href="https://ve.dolarapi.com/v1/dolares/oficial" target="_blank" rel="noopener">DolarAPI</a> (referencial).
-  Tus productos se guardan en este dispositivo.
+  Fórmula: (Monto + IVA + Ganancia) ÷ cantidad, y opcionalmente + colchón en Bs por unidad.
+  Tasa BCV vía <a href="https://ve.dolarapi.com/v1/dolares/oficial" target="_blank" rel="noopener">DolarAPI</a> (referencial).
+  Al guardar cada producto se anota la tasa del momento para avisarte si el dólar se come tu ganancia.
+  Todo se guarda en este dispositivo.
 </footer>
 
 <script>
@@ -156,6 +224,10 @@ const store = {
 };
 const fmt = new Intl.NumberFormat('es-VE',{minimumFractionDigits:2,maximumFractionDigits:2});
 const fmtRate = new Intl.NumberFormat('es-VE',{minimumFractionDigits:2,maximumFractionDigits:4});
+const bs = v => 'Bs ' + fmt.format(v||0);
+const usd = v => '$ ' + fmt.format(v||0);
+const UMBRAL = 5;   // % de pérdida en $ a partir del cual avisamos
+
 let rate = 0, fecha = '', fuente = '';
 let products = [];
 let settings = { iva:16, gan:40 };
@@ -163,7 +235,11 @@ let settings = { iva:16, gan:40 };
 function safeParse(s){ try{ return JSON.parse(s); }catch(e){ return null; } }
 function loadState(){
   products = safeParse(store.get('bcv_products')) || [];
-  products.forEach(p=>{ if(p.saved===undefined) p.saved=true; });   // productos viejos = ya guardados
+  products.forEach(p=>{
+    if(p.saved===undefined) p.saved=true;
+    if(p.gan===undefined || p.gan==='') p.gan = settings.gan;   // migración de productos viejos
+    if(p.colchon===undefined) p.colchon = '';
+  });
   settings = Object.assign(settings, safeParse(store.get('bcv_settings')) || {});
   const cache = safeParse(store.get('bcv_rate_cache'));
   if(cache){ rate=cache.rate; fecha=cache.fecha; fuente=cache.fuente; }
@@ -187,7 +263,7 @@ async function fetchRate(manual){
     fecha = d.fechaActualizacion || new Date().toISOString();
     fuente = 'DolarAPI';
     store.set('bcv_rate_cache', JSON.stringify({rate,fecha,fuente}));
-    dot.className = 'dot live'; renderRate(); recalcAll();
+    dot.className='dot live'; renderRate(); renderList();
   }catch(err){
     dot.className = rate ? 'dot live' : 'dot err';
     if(rate) renderRate();
@@ -203,22 +279,44 @@ function renderRate(){
   } else { f.textContent='Sin datos aún'; }
 }
 
+/* ---------- FÓRMULA ----------
+   1) monto (Bs o $ → convertido con tasa BCV)
+   2) + IVA% (si aplica)
+   3) + Ganancia% (propia de cada producto)
+   4) = subtotal ÷ cantidad = unitario base
+   5) + colchón fijo en Bs por unidad
+   = precio final por unidad                                   */
+function ganDe(p){ return (p.gan===''||p.gan==null) ? (Number(settings.gan)||0) : (Number(p.gan)||0); }
 function compute(p){
-  const monto = Number(p.monto)||0, cant = Number(p.cant)||0;
+  const monto=Number(p.monto)||0, cant=Number(p.cant)||0;
   let montoBs, montoUSD;
   if(p.cur==='usd'){ montoUSD=monto; montoBs=rate?monto*rate:0; }
   else { montoBs=monto; montoUSD=rate?monto/rate:0; }
   const ivaF = p.iva ? (Number(settings.iva)||0)/100 : 0;
-  const ganF = (Number(settings.gan)||0)/100;
-  const ivaBs=montoBs*ivaF, ivaUSD=montoUSD*ivaF, ganBs=montoBs*ganF, ganUSD=montoUSD*ganF;
-  const subBs=montoBs*(1+ivaF+ganF), subUSD=montoUSD*(1+ivaF+ganF);
-  const unitBs = cant>0?subBs/cant:0, unitUSD = cant>0?subUSD/cant:0;
-  return {montoBs,montoUSD,ivaBs,ivaUSD,ganBs,ganUSD,subBs,subUSD,unitBs,unitUSD,cant};
+  const ganF = ganDe(p)/100;
+  const ivaBs=montoBs*ivaF, ganBs=montoBs*ganF;
+  const subBs=montoBs*(1+ivaF+ganF);
+  const unitBase = cant>0 ? subBs/cant : 0;
+  const colch = Number(p.colchon)||0;
+  const unitBs = unitBase + colch;
+  const unitUSD = rate ? unitBs/rate : 0;
+  return {montoBs,montoUSD,ivaBs,ganBs,subBs,unitBase,colch,unitBs,unitUSD,cant,
+          subUSD: rate?subBs/rate:0, ivaUSD: rate?ivaBs/rate:0, ganUSD: rate?ganBs/rate:0};
+}
+
+/* erosión: compara el valor en $ del precio unitario de hoy contra el del día que lo guardaste */
+function erosion(p){
+  if(!p.snap || !p.snap.rate || !rate || !p.snap.unitUSD) return null;
+  const c = compute(p);
+  const hoyUSD = c.unitUSD;
+  if(!hoyUSD) return null;
+  const perdPct = (1 - hoyUSD/p.snap.unitUSD)*100;
+  if(perdPct < UMBRAL) return null;
+  const subeTasa = (rate/p.snap.rate - 1)*100;
+  return { perdPct, subeTasa, antesUSD:p.snap.unitUSD, hoyUSD, fecha:p.snap.ts };
 }
 
 const list = document.getElementById('list');
-const bs = v => 'Bs ' + fmt.format(v);
-const usd = v => '$ ' + fmt.format(v);
 function escapeHtml(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 function escapeAttr(s){ return String(s).replace(/"/g,'&quot;').replace(/</g,'&lt;'); }
 
@@ -226,12 +324,20 @@ function renderList(){
   list.innerHTML='';
   if(products.length===0){
     list.innerHTML='<div class="empty">Aún no hay productos. Toca <b style="color:var(--gold)">+ Agregar</b> para crear el primero.</div>';
-    return;
+    renderAlertaGlobal(); return;
   }
   products.forEach(p => list.appendChild(buildCard(p)));
+  renderAlertaGlobal();
+}
+function renderAlertaGlobal(){
+  const box=document.getElementById('alertaGlobal');
+  const afectados = products.filter(p=>p.saved && erosion(p));
+  if(afectados.length===0){ box.classList.remove('show'); box.innerHTML=''; return; }
+  const n=afectados.length;
+  box.innerHTML = `⚠️ <b>El dólar se está comiendo tu ganancia.</b> ${n} producto${n>1?'s':''} ${n>1?'valen':'vale'} hoy menos en $ que cuando ${n>1?'los':'lo'} cargaste. Revisa ${n>1?'los marcados abajo':'el marcado abajo'}: actualiza el monto o súbele el colchón.`;
+  box.classList.add('show');
 }
 function replaceCard(node,p){ const n=buildCard(p); node.replaceWith(n); return n; }
-
 function buildCard(p){
   const card=document.createElement('div');
   card.className='card' + (p.saved?' saved':'');
@@ -239,30 +345,39 @@ function buildCard(p){
   return card;
 }
 
-/* ---------- VISTA (producto guardado) ---------- */
+/* ---------- VISTA ---------- */
 function renderView(card,p){
-  const c=compute(p);
-  const metaCur = p.cur==='usd' ? '$ '+fmt.format(Number(p.monto)||0) : 'Bs '+fmt.format(Number(p.monto)||0);
+  const c=compute(p), er=erosion(p);
+  if(er) card.classList.add('alert');
+  const montoTxt = p.cur==='usd' ? usd(Number(p.monto)||0) : bs(Number(p.monto)||0);
+  const colchTxt = c.colch>0 ? ` · colchón +${bs(c.colch)}` : '';
   card.innerHTML = `
     <div class="vhead">
       <div>
         <p class="pname">${escapeHtml(p.name||'Sin nombre')}</p>
-        <p class="pmeta">Monto ${metaCur} · Cant ${Number(p.cant)||0} · ${p.iva?'Con IVA':'Sin IVA'}</p>
+        <p class="pmeta">Monto ${montoTxt} · ${Number(p.cant)||0} u. · ${p.iva?'con IVA':'sin IVA'} · ganancia ${ganDe(p)}%${colchTxt}</p>
       </div>
     </div>
-    <div class="unit">
-      <span class="k">Valor unitario</span>
+    <div class="final">
+      <span class="k">Precio final<small>por unidad</small></span>
       <span class="v"><span class="bs" data-o="unitbs">—</span><span class="usd" data-o="unitusd">—</span></span>
     </div>
+    <div class="erosion ${er?'show':''}" data-eros></div>
     <div class="btnrow">
       <button class="btn btn-ghost editbtn">Editar</button>
       <button class="btn btn-danger delbtn">Eliminar</button>
     </div>`;
   card.querySelector('[data-o="unitbs"]').textContent = bs(c.unitBs);
   card.querySelector('[data-o="unitusd"]').textContent = usd(c.unitUSD);
+  if(er){
+    const d=new Date(er.fecha), fecha = !isNaN(d)? d.toLocaleDateString('es-VE',{day:'2-digit',month:'short'}) : '';
+    card.querySelector('[data-eros]').innerHTML =
+      `⚠️ <b>Perdiste ${er.perdPct.toFixed(1)}% de ganancia en $.</b> El dólar subió ${er.subeTasa.toFixed(1)}% desde que lo cargaste${fecha?' el '+fecha:''}.
+       <div class="cmp">Antes: <s>${usd(er.antesUSD)}</s> por unidad → Hoy: ${usd(er.hoyUSD)}</div>`;
+  }
   card.querySelector('.editbtn').addEventListener('click', ()=>{
     p._backup = JSON.parse(JSON.stringify((()=>{const o={};for(const k in p){if(!k.startsWith('_'))o[k]=p[k];}return o;})()));
-    p._new=false; p.saved=false; saveProducts(); replaceCard(card,p);
+    p._new=false; p.saved=false; saveProducts(); replaceCard(card,p); renderAlertaGlobal();
   });
   card.querySelector('.delbtn').addEventListener('click', ()=>{
     products=products.filter(x=>x!==p); saveProducts(); renderList();
@@ -270,32 +385,68 @@ function renderView(card,p){
 }
 
 /* ---------- EDITOR ---------- */
+const GAN_CHIPS = [20,30,40,50];
+const COLCH_CHIPS = [10,20,30];
 function renderEditor(card,p){
   if(!p.cur) p.cur='bs';
+  const colchOpen = (Number(p.colchon)||0) > 0;
   card.innerHTML = `
-    <div class="block"><label>Producto</label>
+    <div class="block"><label>1 · Producto</label>
       <input data-f="name" type="text" placeholder="Nombre" value="${escapeAttr(p.name||'')}" /></div>
-    <div class="block"><label>Monto total</label>
+
+    <div class="block"><label>2 · Monto total del lote</label>
       <div class="montoline">
         <input data-f="monto" class="num" type="number" inputmode="decimal" step="0.01" placeholder="0,00" value="${p.monto ?? ''}" />
         <div class="curtoggle"><button data-cur="bs">Bs</button><button data-cur="usd">$</button></div>
       </div>
-      <div class="equiv" data-o="equiv">—</div></div>
+      <div class="equiv" data-o="equiv">—</div>
+      <div class="hint">Lo que pagaste por todo el lote. Escríbelo en la moneda que quieras: la app convierte con la tasa del BCV.</div></div>
+
     <div class="grid2 block">
-      <div><label>Cantidad</label>
-        <input data-f="cant" class="num" type="number" inputmode="numeric" step="1" placeholder="0" value="${p.cant ?? ''}" /></div>
-      <div><label>&nbsp;</label>
-        <label class="ivatoggle"><input data-f="iva" type="checkbox" ${p.iva?'checked':''}/><small>¿Lleva IVA?</small></label></div>
+      <div><label>3 · Cantidad</label>
+        <input data-f="cant" class="num" type="number" inputmode="numeric" step="1" placeholder="0" value="${p.cant ?? ''}" />
+        <div class="hint">Unidades del lote.</div></div>
+      <div><label>4 · Impuesto</label>
+        <label class="ivatoggle"><input data-f="iva" type="checkbox" ${p.iva?'checked':''}/><small>¿Lleva IVA?</small></label>
+        <div class="hint">Márcalo solo si el producto es gravado.</div></div>
     </div>
-    <div class="breakdown">
-      <div class="li"><span>Monto total</span><span class="num" data-o="monto">—</span></div>
-      <div class="li" data-ivarow><span>IVA <span data-o="ivapct"></span></span><span class="num" data-o="iva">—</span></div>
-      <div class="li"><span>Ganancia <span data-o="ganpct"></span></span><span class="num" data-o="gan">—</span></div>
-      <div class="li"><span>Subtotal ÷ <span data-o="cant">0</span></span><span class="num" data-o="sub">—</span></div>
-      <div class="unit"><span class="k">Valor unitario</span>
-        <span class="v"><span class="bs" data-o="unitbs">—</span><span class="usd" data-o="unitusd">—</span></span></div>
+
+    <div class="block"><label>5 · Margen de ganancia</label>
+      <div class="chips" data-ganchips>
+        ${GAN_CHIPS.map(v=>`<button class="chip" data-gan="${v}">${v}%</button>`).join('')}
+      </div>
+      <input data-f="gan" class="num" type="number" inputmode="decimal" step="1" placeholder="40" value="${p.gan ?? ''}" />
+      <div class="hint">Toca un atajo o escribe el que quieras. Súbelo si tiene poca competencia, bájalo si hay mucha.</div></div>
+
+    <div class="colch ${colchOpen?'on':'closed'}" data-colch>
+      <div class="head" data-colchhead>
+        <span class="t">🛡️ Agregar monto para protección de ganancias</span>
+        <span class="st" data-colchst>${colchOpen?'+ '+bs(Number(p.colchon)||0):'Opcional'}</span>
+      </div>
+      <div class="inner">
+        <div class="chips" data-colchchips>
+          ${COLCH_CHIPS.map(v=>`<button class="chip" data-colch="${v}">+${v} Bs</button>`).join('')}
+          <button class="chip" data-colch="0">Ninguno</button>
+        </div>
+        <input data-f="colchon" class="num" type="number" inputmode="decimal" step="0.01" placeholder="0,00" value="${p.colchon ?? ''}" />
+        <div class="hint">Bs fijos que se suman <b>a cada unidad</b> al final, después de todo el cálculo. Es tu colchón por si el dólar sube antes de vender.</div>
+      </div>
     </div>
-    <div class="warn" data-warn>Completa monto y cantidad para guardar.</div>
+
+    <div class="steps">
+      <div class="step"><span class="n">1</span><span class="txt"><span class="k">Monto total</span><span class="d">lo que pagaste por el lote</span></span><span class="v" data-o="monto">—</span></div>
+      <div class="step plus" data-ivarow><span class="n">2</span><span class="txt"><span class="k">+ IVA <span data-o="ivapct"></span></span><span class="d">sobre el monto total</span></span><span class="v" data-o="iva">—</span></div>
+      <div class="step plus"><span class="n">3</span><span class="txt"><span class="k">+ Ganancia <span data-o="ganpct"></span></span><span class="d">sobre el monto total</span></span><span class="v" data-o="gan">—</span></div>
+      <div class="step eq"><span class="n">=</span><span class="txt"><span class="k">Subtotal del lote</span></span><span class="v" data-o="sub">—</span></div>
+      <div class="step"><span class="n">÷</span><span class="txt"><span class="k">Entre <span data-o="cant">0</span> unidades</span></span><span class="v" data-o="unitbase">—</span></div>
+      <div class="step plus" data-colchrow><span class="n">+</span><span class="txt"><span class="k">Colchón por unidad</span><span class="d">protección contra el dólar</span></span><span class="v" data-o="colch">—</span></div>
+      <div class="final">
+        <span class="k">Precio final<small>por unidad</small></span>
+        <span class="v"><span class="bs" data-o="unitbs">—</span><span class="usd" data-o="unitusd">—</span></span>
+      </div>
+    </div>
+
+    <div class="warnmsg" data-warn>Completa el monto y la cantidad para poder guardar.</div>
     <div class="btnrow">
       <button class="btn btn-primary savebtn">✓ Guardar</button>
       <button class="btn btn-ghost cancelbtn">Cancelar</button>
@@ -306,13 +457,42 @@ function renderEditor(card,p){
   setCur();
   curBtns.forEach(b=>b.addEventListener('click', ()=>{ p.cur=b.dataset.cur; setCur(); saveProducts(); recalcCard(card,p); }));
 
+  const ganChips = card.querySelectorAll('[data-ganchips] .chip');
+  const syncGan = ()=>ganChips.forEach(b=>b.classList.toggle('on', Number(b.dataset.gan)===Number(p.gan)));
+  syncGan();
+  ganChips.forEach(b=>b.addEventListener('click', ()=>{
+    p.gan = Number(b.dataset.gan);
+    card.querySelector('[data-f="gan"]').value = p.gan;
+    syncGan(); saveProducts(); recalcCard(card,p);
+  }));
+
+  const colchBox = card.querySelector('[data-colch]');
+  const colchChips = card.querySelectorAll('[data-colchchips] .chip');
+  const colchInput = card.querySelector('[data-f="colchon"]');
+  const syncColch = ()=>{
+    const v = Number(p.colchon)||0;
+    colchChips.forEach(b=>b.classList.toggle('on', Number(b.dataset.colch)===v));
+    colchBox.classList.toggle('on', v>0);
+    card.querySelector('[data-colchst]').textContent = v>0 ? '+ '+bs(v) : 'Opcional';
+  };
+  syncColch();
+  card.querySelector('[data-colchhead]').addEventListener('click', ()=>colchBox.classList.toggle('closed'));
+  colchChips.forEach(b=>b.addEventListener('click', ()=>{
+    const v=Number(b.dataset.colch);
+    p.colchon = v===0 ? '' : v;
+    colchInput.value = p.colchon;
+    syncColch(); saveProducts(); recalcCard(card,p);
+  }));
+
   card.querySelectorAll('input[data-f]').forEach(inp=>{
     const f=inp.dataset.f, ev=inp.type==='checkbox'?'change':'input';
     inp.addEventListener(ev, ()=>{
       p[f] = inp.type==='checkbox'?inp.checked:inp.value;
       inp.classList.remove('err');
-      const ivt=card.querySelector('.ivatoggle'); if(f==='iva'&&ivt) ivt.classList.toggle('active', inp.checked);
-      saveProducts(); recalcCard(card,p);   // persiste en cada cambio, aunque no confirmes
+      if(f==='iva'){ const ivt=card.querySelector('.ivatoggle'); if(ivt) ivt.classList.toggle('active', inp.checked); }
+      if(f==='gan') syncGan();
+      if(f==='colchon') syncColch();
+      saveProducts(); recalcCard(card,p);
     });
   });
   const ivt=card.querySelector('.ivatoggle'); if(ivt) ivt.classList.toggle('active', !!p.iva);
@@ -325,13 +505,14 @@ function renderEditor(card,p){
       if(!cantOk) card.querySelector('[data-f="cant"]').classList.add('err');
       return;
     }
-    p.saved=true; delete p._new; delete p._backup; saveProducts(); replaceCard(card,p);
+    const c=compute(p);
+    if(rate) p.snap = { rate, unitBs:c.unitBs, unitUSD:c.unitUSD, ts:new Date().toISOString() };
+    p.saved=true; delete p._new; delete p._backup; saveProducts(); replaceCard(card,p); renderAlertaGlobal();
   });
-
   card.querySelector('.cancelbtn').addEventListener('click', ()=>{
     if(p._new){ products=products.filter(x=>x!==p); saveProducts(); renderList(); return; }
     if(p._backup){ for(const k in p){ if(!k.startsWith('_')) delete p[k]; } Object.assign(p, p._backup); }
-    p.saved=true; delete p._new; delete p._backup; saveProducts(); replaceCard(card,p);
+    p.saved=true; delete p._new; delete p._backup; saveProducts(); replaceCard(card,p); renderAlertaGlobal();
   });
 
   recalcCard(card,p);
@@ -339,29 +520,32 @@ function renderEditor(card,p){
 
 function recalcCard(card,p){
   const c=compute(p), q=s=>card.querySelector(`[data-o="${s}"]`);
+  const set=(s,v)=>{ const el=q(s); if(el) el.textContent=v; };
   const eq=q('equiv');
   if(eq){
-    if(!rate) eq.textContent='Esperando tasa BCV…';
-    else if(p.cur==='usd') eq.textContent='= '+bs(c.montoBs);
-    else eq.textContent='= '+usd(c.montoUSD);
+    if(!rate) eq.textContent='Esperando tasa del BCV…';
+    else if(p.cur==='usd') eq.textContent='= '+bs(c.montoBs)+' a la tasa de hoy';
+    else eq.textContent='= '+usd(c.montoUSD)+' a la tasa de hoy';
   }
-  const set=(s,v)=>{ const el=q(s); if(el) el.textContent=v; };
-  set('monto', bs(c.montoBs)+'  /  '+usd(c.montoUSD));
+  set('monto', bs(c.montoBs));
   set('ivapct', (Number(settings.iva)||0)+'%');
-  set('ganpct', (Number(settings.gan)||0)+'%');
-  set('iva', bs(c.ivaBs)+'  /  '+usd(c.ivaUSD));
-  set('gan', bs(c.ganBs)+'  /  '+usd(c.ganUSD));
+  set('ganpct', ganDe(p)+'%');
+  set('iva', bs(c.ivaBs));
+  set('gan', bs(c.ganBs));
+  set('sub', bs(c.subBs));
   set('cant', c.cant||0);
-  set('sub', bs(c.subBs)+'  /  '+usd(c.subUSD));
+  set('unitbase', bs(c.unitBase));
+  set('colch', bs(c.colch));
   set('unitbs', bs(c.unitBs));
   set('unitusd', usd(c.unitUSD));
   const ivarow=card.querySelector('[data-ivarow]'); if(ivarow) ivarow.classList.toggle('hide', !p.iva);
+  const colchrow=card.querySelector('[data-colchrow]'); if(colchrow) colchrow.classList.toggle('hide', !(c.colch>0));
 }
-
-function recalcAll(){ [...list.children].forEach((card,i)=>{ if(products[i]) recalcCard(card, products[i]); }); }
+function recalcAll(){ renderList(); }
 
 document.getElementById('addBtn').addEventListener('click', ()=>{
-  const p={ id:Date.now(), name:'', monto:'', cur:'bs', cant:'', iva:true, saved:false, _new:true };
+  const p={ id:Date.now(), name:'', monto:'', cur:'bs', cant:'', iva:true,
+            gan:Number(settings.gan)||40, colchon:'', saved:false, _new:true };
   products.push(p); saveProducts();
   if(products.length===1) renderList();
   else list.appendChild(buildCard(p));
@@ -372,7 +556,7 @@ document.getElementById('refreshBtn').addEventListener('click', ()=>fetchRate(tr
 const ivaInput=document.getElementById('ivaInput'); ivaInput.value=settings.iva;
 ivaInput.addEventListener('input', ()=>{ settings.iva=ivaInput.value; saveSettings(); recalcAll(); });
 const ganInput=document.getElementById('ganInput'); ganInput.value=settings.gan;
-ganInput.addEventListener('input', ()=>{ settings.gan=ganInput.value; saveSettings(); recalcAll(); });
+ganInput.addEventListener('input', ()=>{ settings.gan=ganInput.value; saveSettings(); });
 
 document.addEventListener('visibilitychange', ()=>{ if(!document.hidden) fetchRate(false); });
 setInterval(()=>fetchRate(false), 30*60*1000);
