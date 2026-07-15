@@ -26,8 +26,7 @@
   html,body{margin:0}
   body{background:var(--ink); color:var(--text); font-family:var(--body);
     -webkit-font-smoothing:antialiased; line-height:1.45;
-    padding:0 14px calc(40px + env(safe-area-inset-bottom)) 14px; max-width:680px; margin:0 auto;
-    overflow-x:hidden;}
+    padding:0 14px calc(40px + env(safe-area-inset-bottom)) 14px; max-width:680px; margin:0 auto; overflow-x:hidden;}
   h1{font-family:var(--disp); font-weight:700; font-size:1.05rem; letter-spacing:.02em; margin:0}
   .num{font-family:var(--mono); font-variant-numeric:tabular-nums}
   button{font-family:var(--body); cursor:pointer; border:none; background:none; color:inherit}
@@ -39,15 +38,34 @@
   label{display:block; font-size:.7rem; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); margin:0 0 5px 2px}
   .hint{font-size:.73rem; color:var(--muted); margin:5px 0 0 2px; line-height:1.45}
 
+  /* ---- login ---- */
+  #gate{position:fixed; inset:0; background:var(--ink); z-index:100; display:none;
+    align-items:center; justify-content:center; padding:24px}
+  #gate.show{display:flex}
+  #gate .box{width:100%; max-width:340px}
+  #gate h2{font-family:var(--disp); font-size:1.5rem; margin:0 0 4px}
+  #gate p.s{color:var(--muted); font-size:.85rem; margin:0 0 22px}
+  #gate .f{margin-bottom:11px}
+  #gate .msg{font-size:.8rem; margin-top:11px; min-height:18px; color:var(--danger)}
+
+  #app{display:none}
+  #app.show{display:block}
+
   header{display:flex; align-items:center; gap:10px; padding:18px 2px 12px}
   header .dot{width:9px; height:9px; border-radius:50%; background:var(--muted); flex:none; transition:.3s}
   header .dot.live{background:var(--pos); box-shadow:0 0 10px rgba(89,195,155,.6)}
   header .dot.err{background:var(--danger)}
+  header .sp{flex:1}
+  .who{font-size:.7rem; color:var(--muted); font-family:var(--mono); overflow:hidden; text-overflow:ellipsis; max-width:130px; white-space:nowrap}
+  .out{font-size:.72rem; color:var(--muted); border:1px solid var(--line); border-radius:8px; padding:5px 9px; flex:none}
+
+  .modo{display:inline-block; font-size:.6rem; text-transform:uppercase; letter-spacing:.08em;
+    padding:2px 7px; border-radius:999px; border:1px solid var(--line); color:var(--muted)}
+  .modo.nube{border-color:rgba(89,195,155,.4); color:var(--pos)}
 
   .rate{position:sticky; top:0; z-index:20;
     background:linear-gradient(180deg,#1A2130 0%,#161C29 100%);
-    border:1px solid var(--line); border-radius:16px; padding:14px 16px;
-    box-shadow:0 8px 24px rgba(0,0,0,.45);}
+    border:1px solid var(--line); border-radius:16px; padding:14px 16px; box-shadow:0 8px 24px rgba(0,0,0,.45);}
   .rate .top{display:flex; justify-content:space-between; align-items:baseline; gap:8px}
   .rate .lbl{font-size:.68rem; text-transform:uppercase; letter-spacing:.09em; color:var(--muted)}
   .rate .big{font-family:var(--mono); font-weight:600; font-size:2.1rem; color:var(--gold); line-height:1.05; margin:4px 0 2px; letter-spacing:-.01em}
@@ -63,6 +81,9 @@
     border-radius:13px; padding:12px 13px; font-size:.83rem; line-height:1.5}
   .alerta.show{display:block}
   .alerta b{color:var(--warn)}
+  .neterr{display:none; margin-top:12px; border:1px solid rgba(228,105,91,.4); background:rgba(228,105,91,.08);
+    border-radius:13px; padding:11px 13px; font-size:.8rem; line-height:1.5}
+  .neterr.show{display:block}
 
   details.expl{margin-top:12px; border:1px solid var(--line); background:var(--surface); border-radius:13px; overflow:hidden}
   details.expl summary{list-style:none; cursor:pointer; padding:12px 14px; font-size:.83rem; font-weight:600; color:var(--gold); display:flex; justify-content:space-between; align-items:center; gap:8px}
@@ -75,10 +96,22 @@
   details.expl .body b{color:var(--text); font-weight:600}
 
   .settings{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:12px 0 0; align-items:start}
-  .sec{display:flex; justify-content:space-between; align-items:center; margin:22px 2px 12px; gap:10px}
-  .sec h2{font-family:var(--disp); font-size:.8rem; text-transform:uppercase; letter-spacing:.1em; color:var(--muted); font-weight:600; margin:0}
-  .add{border:1px dashed var(--gold-dim); color:var(--gold); border-radius:10px; padding:8px 14px; font-size:.82rem; font-weight:600; flex:none}
+  .sec{display:flex; justify-content:space-between; align-items:center; margin:22px 2px 12px; gap:8px}
+  .sec h2{font-family:var(--disp); font-size:.8rem; text-transform:uppercase; letter-spacing:.1em; color:var(--muted); font-weight:600; margin:0; flex:1 1 auto}
+  .sec .cnt{font-family:var(--mono); font-size:.7rem; color:var(--muted); flex:none}
+  .iconbtn{border:1px solid var(--line); background:var(--surface-2); border-radius:10px; width:38px; height:38px;
+    display:flex; align-items:center; justify-content:center; flex:none; color:var(--muted)}
+  .iconbtn.on{border-color:var(--gold); color:var(--gold)}
+  .iconbtn:active{transform:scale(.96)}
+  .add{border:1px dashed var(--gold-dim); color:var(--gold); border-radius:10px; padding:9px 13px; font-size:.82rem; font-weight:600; flex:none}
   .add:active{transform:scale(.98)}
+
+  .searchbar{display:none; margin:0 0 12px; position:relative}
+  .searchbar.show{display:block}
+  .searchbar input{font-family:var(--body); padding-left:38px; padding-right:38px}
+  .searchbar .ic{position:absolute; left:12px; top:50%; transform:translateY(-50%); color:var(--muted); pointer-events:none; display:flex}
+  .searchbar .clr{position:absolute; right:8px; top:50%; transform:translateY(-50%); color:var(--muted);
+    width:26px; height:26px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:1rem}
 
   .card{background:var(--surface); border:1px solid var(--line); border-radius:14px; padding:13px; margin-bottom:12px; overflow:hidden}
   .card.saved{border-color:#33405A}
@@ -91,7 +124,6 @@
   .curtoggle button.on{background:var(--gold); color:#1a1305; font-weight:600}
   .equiv{font-family:var(--mono); font-size:.77rem; color:var(--pos); margin:6px 0 0 2px}
 
-  /* fila cantidad + iva: apilada en móvil, lado a lado en pantallas anchas */
   .duo{display:grid; grid-template-columns:1fr; gap:13px; align-items:start}
   @media(min-width:520px){ .duo{grid-template-columns:1fr 1fr; gap:10px} }
   .duo > div{min-width:0}
@@ -141,7 +173,6 @@
   .vhead .pname{font-family:var(--disp); font-size:1.05rem; font-weight:600; margin:0; word-break:break-word}
   .vhead .pmeta{font-family:var(--mono); font-size:.73rem; color:var(--muted); margin:4px 0 0; line-height:1.55}
 
-  /* aviso de cambio de tasa */
   .rc{margin-top:12px; border-radius:11px; padding:11px 12px; font-size:.77rem; line-height:1.55;
     border:1px solid rgba(224,163,62,.4); background:rgba(224,163,62,.08); display:none}
   .rc.show{display:block}
@@ -159,6 +190,7 @@
   .btnrow{display:flex; gap:8px; margin-top:12px}
   .btn{flex:1 1 0; min-width:0; text-align:center; padding:12px 8px; border-radius:11px; font-size:.88rem; font-weight:600}
   .btn:active{transform:scale(.98)}
+  .btn[disabled]{opacity:.55}
   .btn-primary{background:var(--gold); color:#1a1305}
   .btn-ghost{border:1px solid var(--line); background:var(--surface-2); color:var(--text)}
   .btn-danger{border:1px solid rgba(228,105,91,.4); color:var(--danger); background:transparent}
@@ -170,9 +202,29 @@
 </head>
 <body>
 
+<!-- ===================== LOGIN ===================== -->
+<div id="gate">
+  <div class="box">
+    <h2>Costos <span style="color:var(--gold)">BCV</span></h2>
+    <p class="s">Entra con el correo que te dieron.</p>
+    <div class="f"><label for="gEmail">Correo</label>
+      <input id="gEmail" type="email" inputmode="email" autocomplete="username" placeholder="tu@correo.com" /></div>
+    <div class="f"><label for="gPass">Clave</label>
+      <input id="gPass" type="password" autocomplete="current-password" placeholder="••••••••" /></div>
+    <button class="btn btn-primary" id="gBtn" style="width:100%; margin-top:6px">Entrar</button>
+    <div class="msg" id="gMsg"></div>
+  </div>
+</div>
+
+<!-- ===================== APP ===================== -->
+<div id="app">
 <header>
   <div class="dot" id="statusDot"></div>
   <h1>Costos&nbsp;<span style="color:var(--gold)">BCV</span></h1>
+  <span class="modo" id="modoTag">local</span>
+  <span class="sp"></span>
+  <span class="who" id="whoTag"></span>
+  <button class="out" id="outBtn" style="display:none">Salir</button>
 </header>
 
 <section class="rate">
@@ -191,6 +243,7 @@
 </section>
 
 <div class="alerta" id="alertaGlobal"></div>
+<div class="neterr" id="netErr"></div>
 
 <details class="expl">
   <summary>¿Cómo se calcula el precio? Toca para ver</summary>
@@ -216,135 +269,236 @@
     <div class="hint">Sugerida al crear. Cada producto lleva la suya.</div></div>
 </div>
 
-<div class="sec"><h2>Productos</h2><button class="add" id="addBtn">+ Agregar</button></div>
+<div class="sec">
+  <h2>Productos</h2>
+  <span class="cnt" id="cnt"></span>
+  <button class="iconbtn" id="searchBtn" aria-label="Buscar">
+    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.6-3.6"/></svg>
+  </button>
+  <button class="add" id="addBtn">+ Agregar</button>
+</div>
+
+<div class="searchbar" id="searchBar">
+  <span class="ic"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.6-3.6"/></svg></span>
+  <input id="searchInput" type="search" placeholder="Buscar producto por nombre…" autocomplete="off" />
+  <button class="clr" id="searchClear">✕</button>
+</div>
+
 <div id="list"></div>
 
 <footer>
   Fórmula por unidad: Costo + IVA + Ganancia + colchón opcional = precio final. La cantidad multiplica para darte el total.
   Tasa BCV vía <a href="https://ve.dolarapi.com/v1/dolares/oficial" target="_blank" rel="noopener">DolarAPI</a> (referencial).
-  Al guardar se anota la tasa del momento para avisarte cuando el dólar cambie. Todo se guarda en este dispositivo.
+  Al guardar se anota la tasa del momento para avisarte cuando el dólar cambie.
 </footer>
+</div>
 
-<script>
-const mem = {};
-const store = {
-  get(k){ try{ return localStorage.getItem(k); }catch(e){ return k in mem ? mem[k] : null; } },
+<script type="module">
+/* ============================================================
+   CONFIG — pega aquí lo de tu proyecto nuevo de Supabase.
+   Dashboard → Settings → API
+   Si lo dejas como está, la app funciona igual pero solo en este
+   dispositivo (modo local), sin sincronizar.
+   ============================================================ */
+const CFG = {
+  url: 'PEGA_AQUI_TU_PROJECT_URL',   // ej: https://abcdefgh.supabase.co
+  key: 'PEGA_AQUI_TU_ANON_KEY'       // la clave anon / publishable (es pública, va aquí)
+};
+
+/* ---------- utilidades ---------- */
+const mem={};
+const store={
+  get(k){ try{ return localStorage.getItem(k); }catch(e){ return k in mem?mem[k]:null; } },
   set(k,v){ try{ localStorage.setItem(k,v); }catch(e){ mem[k]=v; } }
 };
-const fmt = new Intl.NumberFormat('es-VE',{minimumFractionDigits:2,maximumFractionDigits:2});
-const fmtRate = new Intl.NumberFormat('es-VE',{minimumFractionDigits:2,maximumFractionDigits:4});
-const bs = v => 'Bs ' + fmt.format(v||0);
-const usd = v => '$ ' + fmt.format(v||0);
-const UMBRAL_TASA = 0.001;   // 0,1% de variación ya dispara el aviso
+const fmt=new Intl.NumberFormat('es-VE',{minimumFractionDigits:2,maximumFractionDigits:2});
+const fmtRate=new Intl.NumberFormat('es-VE',{minimumFractionDigits:2,maximumFractionDigits:4});
+const bs=v=>'Bs '+fmt.format(v||0);
+const usd=v=>'$ '+fmt.format(v||0);
+const UMBRAL_TASA=0.001;
+const safeParse=s=>{ try{ return JSON.parse(s); }catch(e){ return null; } };
+const norm=s=>String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim();
+const uuid=()=>{ try{ return crypto.randomUUID(); }catch(e){ return 'x'+Date.now()+Math.random().toString(16).slice(2); } };
 
-let rate = 0, fecha = '', fuente = '';
-let products = [];
-let settings = { iva:16, gan:40 };
+let rate=0, fecha='', fuente='';
+let products=[], settings={iva:16,gan:40}, filtro='';
+let sb=null, user=null, MODO='local';
 
-function safeParse(s){ try{ return JSON.parse(s); }catch(e){ return null; } }
-function loadState(){
+/* ---------- arranque de Supabase ---------- */
+const cfgOk = CFG.url && CFG.key && !CFG.url.startsWith('PEGA_') && !CFG.key.startsWith('PEGA_');
+if(cfgOk){
+  try{
+    const { createClient } = await import('https://esm.sh/@supabase/supabase-js@2');
+    sb = createClient(CFG.url, CFG.key);
+    MODO='nube';
+  }catch(e){ console.warn('Supabase no cargó, sigo en modo local:', e); sb=null; MODO='local'; }
+}
+
+/* ---------- mapeo app <-> base de datos ---------- */
+const aFila = p => ({
+  id:p.id, nombre:p.name||'', monto:Number(p.monto)||0, moneda:p.cur||'bs',
+  cantidad:Number(p.cant)||1, iva:!!p.iva, ganancia:Number(ganDe(p))||0, colchon:Number(p.colchon)||0,
+  snap_rate:p.snap?.rate ?? null, snap_costo_usd:p.snap?.costoUSD ?? null, snap_ts:p.snap?.ts ?? null
+});
+const aProd = f => ({
+  id:f.id, name:f.nombre||'', monto:f.monto, cur:f.moneda||'bs', cant:f.cantidad??1,
+  iva:!!f.iva, gan:f.ganancia, colchon:Number(f.colchon)||0 ? f.colchon : '',
+  snap: f.snap_rate ? { rate:Number(f.snap_rate), costoUSD:Number(f.snap_costo_usd), ts:f.snap_ts } : null,
+  saved:true
+});
+
+/* ---------- persistencia ---------- */
+function cacheLocal(){
+  const clean=products.map(p=>{ const o={}; for(const k in p){ if(!k.startsWith('_')) o[k]=p[k]; } return o; });
+  store.set('bcv_products', JSON.stringify(clean));
+}
+function netErr(msg){
+  const b=document.getElementById('netErr');
+  if(!msg){ b.classList.remove('show'); b.textContent=''; return; }
+  b.textContent='⚠️ '+msg; b.classList.add('show');
+}
+async function subirProducto(p){
+  cacheLocal();
+  if(MODO!=='nube' || !user) return true;
+  const { error } = await sb.from('productos').upsert(aFila(p));
+  if(error){ netErr('No se pudo guardar en la nube: '+error.message+'. Quedó guardado en este teléfono.'); return false; }
+  netErr(''); return true;
+}
+async function borrarProducto(id){
+  cacheLocal();
+  if(MODO!=='nube' || !user) return true;
+  const { error } = await sb.from('productos').delete().eq('id', id);
+  if(error){ netErr('No se pudo borrar en la nube: '+error.message); return false; }
+  netErr(''); return true;
+}
+async function bajarTodo(){
+  if(MODO!=='nube' || !user) return;
+  const [rp, ra] = await Promise.all([
+    sb.from('productos').select('*').order('created_at',{ascending:true}),
+    sb.from('ajustes').select('*').eq('id',1).maybeSingle()
+  ]);
+  if(rp.error){ netErr('No pude leer los productos de la nube: '+rp.error.message+'. Te muestro lo guardado en este teléfono.'); return; }
+  netErr('');
+  const enEdicion = products.filter(p=>!p.saved);
+  products = rp.data.map(aProd).concat(enEdicion);
+  cacheLocal();
+  if(!ra.error && ra.data){
+    settings.iva = Number(ra.data.iva); settings.gan = Number(ra.data.ganancia);
+    store.set('bcv_settings', JSON.stringify(settings));
+    document.getElementById('ivaInput').value = settings.iva;
+    document.getElementById('ganInput').value = settings.gan;
+  }
+  renderList();
+}
+let ajusteT=null;
+function subirAjustes(){
+  store.set('bcv_settings', JSON.stringify(settings));
+  if(MODO!=='nube' || !user) return;
+  clearTimeout(ajusteT);
+  ajusteT=setTimeout(async ()=>{
+    const { error } = await sb.from('ajustes').update({ iva:Number(settings.iva)||0, ganancia:Number(settings.gan)||0 }).eq('id',1);
+    if(error) netErr('No se pudieron guardar los ajustes en la nube: '+error.message);
+  }, 700);
+}
+function cargarCache(){
   settings = Object.assign(settings, safeParse(store.get('bcv_settings')) || {});
   products = safeParse(store.get('bcv_products')) || [];
   products.forEach(p=>{
     if(p.saved===undefined) p.saved=true;
-    if(p.gan===undefined || p.gan==='') p.gan = settings.gan;
+    if(p.gan===undefined||p.gan==='') p.gan=settings.gan;
     if(p.colchon===undefined) p.colchon='';
-    if(p.cant===undefined || p.cant==='' ) p.cant = 1;
+    if(p.cant===undefined||p.cant==='') p.cant=1;
+    if(!p.id) p.id=uuid();
   });
-  const cache = safeParse(store.get('bcv_rate_cache'));
-  if(cache){ rate=cache.rate; fecha=cache.fecha; fuente=cache.fuente; }
+  const c=safeParse(store.get('bcv_rate_cache'));
+  if(c){ rate=c.rate; fecha=c.fecha; fuente=c.fuente; }
 }
-function saveProducts(){
-  const clean = products.map(p=>{ const o={}; for(const k in p){ if(!k.startsWith('_')) o[k]=p[k]; } return o; });
-  store.set('bcv_products', JSON.stringify(clean));
-}
-function saveSettings(){ store.set('bcv_settings', JSON.stringify(settings)); }
 
+/* ---------- tasa BCV ---------- */
 async function fetchRate(manual){
   const btn=document.getElementById('refreshBtn'), dot=document.getElementById('statusDot');
   if(manual) btn.classList.add('spin');
   try{
-    const r = await fetch('https://ve.dolarapi.com/v1/dolares/oficial', {cache:'no-store'});
+    const r=await fetch('https://ve.dolarapi.com/v1/dolares/oficial',{cache:'no-store'});
     if(!r.ok) throw new Error('http '+r.status);
-    const d = await r.json();
-    const val = d.promedio ?? d.venta ?? d.compra;
+    const d=await r.json();
+    const val=d.promedio ?? d.venta ?? d.compra;
     if(!val) throw new Error('sin valor');
-    rate=Number(val);
-    fecha=d.fechaActualizacion || new Date().toISOString();
-    fuente='DolarAPI';
+    rate=Number(val); fecha=d.fechaActualizacion||new Date().toISOString(); fuente='DolarAPI';
     store.set('bcv_rate_cache', JSON.stringify({rate,fecha,fuente}));
     dot.className='dot live'; renderRate(); renderList();
   }catch(err){
-    dot.className = rate ? 'dot live' : 'dot err';
+    dot.className = rate?'dot live':'dot err';
     if(rate) renderRate();
     console.warn('No se pudo actualizar la tasa:', err);
-  }finally{ if(manual) setTimeout(()=>btn.classList.remove('spin'), 500); }
+  }finally{ if(manual) setTimeout(()=>btn.classList.remove('spin'),500); }
 }
 function renderRate(){
-  document.getElementById('rateVal').textContent = rate ? fmtRate.format(rate) : '—';
-  document.getElementById('fuente').textContent = fuente || '—';
+  document.getElementById('rateVal').textContent = rate?fmtRate.format(rate):'—';
+  document.getElementById('fuente').textContent = fuente||'—';
   const f=document.getElementById('fecha');
   if(fecha){ const dt=new Date(fecha);
-    f.textContent = !isNaN(dt) ? 'Actualizado '+dt.toLocaleString('es-VE',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}) : 'Última tasa conocida';
+    f.textContent = !isNaN(dt)?'Actualizado '+dt.toLocaleString('es-VE',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}):'Última tasa conocida';
   } else f.textContent='Sin datos aún';
 }
 
-/* ---------- FÓRMULA (por unidad) ----------
-   1) costo de UNA unidad (Bs o $ → tasa BCV)
-   2) + IVA% (si aplica)
-   3) + Ganancia% (propia del producto)
-   4) + colchón fijo en Bs
-   = precio final por unidad
-   × cantidad = total que tienes                              */
-function ganDe(p){ return (p.gan===''||p.gan==null) ? (Number(settings.gan)||0) : (Number(p.gan)||0); }
+/* ---------- fórmula ---------- */
+function ganDe(p){ return (p.gan===''||p.gan==null)?(Number(settings.gan)||0):(Number(p.gan)||0); }
 function cantDe(p){ const n=Number(p.cant); return (!n||n<1)?1:n; }
 function compute(p){
   const monto=Number(p.monto)||0;
-  let costoBs, costoUSD;
+  let costoBs,costoUSD;
   if(p.cur==='usd'){ costoUSD=monto; costoBs=rate?monto*rate:0; }
   else { costoBs=monto; costoUSD=rate?monto/rate:0; }
-  const ivaF = p.iva ? (Number(settings.iva)||0)/100 : 0;
-  const ganF = ganDe(p)/100;
+  const ivaF=p.iva?(Number(settings.iva)||0)/100:0, ganF=ganDe(p)/100;
   const ivaBs=costoBs*ivaF, ganBs=costoBs*ganF;
-  const preColch = costoBs*(1+ivaF+ganF);
-  const colch = Number(p.colchon)||0;
-  const unitBs = preColch + colch;
-  const unitUSD = rate ? unitBs/rate : 0;
-  const cant = cantDe(p);
-  const totalBs = unitBs*cant, totalUSD = rate ? totalBs/rate : 0;
+  const preColch=costoBs*(1+ivaF+ganF), colch=Number(p.colchon)||0;
+  const unitBs=preColch+colch, unitUSD=rate?unitBs/rate:0;
+  const cant=cantDe(p), totalBs=unitBs*cant, totalUSD=rate?totalBs/rate:0;
   return {costoBs,costoUSD,ivaBs,ganBs,preColch,colch,unitBs,unitUSD,cant,totalBs,totalUSD};
 }
-
-/* cambio de tasa desde que se guardó (solo productos cargados en Bs) */
 function cambioTasa(p){
-  if(p.cur!=='bs' || !p.saved || !p.snap || !p.snap.rate || !rate) return null;
-  const diff = (rate - p.snap.rate)/p.snap.rate;
-  if(Math.abs(diff) < UMBRAL_TASA) return null;
-  const montoUSDsave = p.snap.costoUSD || ((Number(p.monto)||0)/p.snap.rate);
-  const nuevoMontoBs = montoUSDsave * rate;
-  return { subio: diff>0, pct: Math.abs(diff*100), tasaAntes:p.snap.rate, tasaHoy:rate,
-           montoUSD:montoUSDsave, montoAntes:Number(p.monto)||0, nuevoMontoBs, ts:p.snap.ts };
+  if(p.cur!=='bs'||!p.saved||!p.snap||!p.snap.rate||!rate) return null;
+  const diff=(rate-p.snap.rate)/p.snap.rate;
+  if(Math.abs(diff)<UMBRAL_TASA) return null;
+  const montoUSDsave=p.snap.costoUSD || ((Number(p.monto)||0)/p.snap.rate);
+  return { subio:diff>0, pct:Math.abs(diff*100), tasaAntes:p.snap.rate, tasaHoy:rate,
+           montoUSD:montoUSDsave, montoAntes:Number(p.monto)||0, nuevoMontoBs:montoUSDsave*rate, ts:p.snap.ts };
 }
 
+/* ---------- render ---------- */
 const list=document.getElementById('list');
-function escapeHtml(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-function escapeAttr(s){ return String(s).replace(/"/g,'&quot;').replace(/</g,'&lt;'); }
+const escapeHtml=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const escapeAttr=s=>String(s).replace(/"/g,'&quot;').replace(/</g,'&lt;');
 
+function visibles(){
+  if(!filtro) return products;
+  const f=norm(filtro);
+  return products.filter(p=>!p.saved || norm(p.name).includes(f));
+}
 function renderList(){
   list.innerHTML='';
+  const vis=visibles();
+  document.getElementById('cnt').textContent =
+    filtro ? `${vis.filter(p=>p.saved).length}/${products.filter(p=>p.saved).length}` :
+    (products.length?String(products.length):'');
   if(products.length===0){
     list.innerHTML='<div class="empty">Aún no hay productos. Toca <b style="color:var(--gold)">+ Agregar</b> para crear el primero.</div>';
     renderAlertaGlobal(); return;
   }
-  products.forEach(p=>list.appendChild(buildCard(p)));
+  if(vis.length===0){
+    list.innerHTML=`<div class="empty">Ningún producto coincide con “${escapeHtml(filtro)}”.</div>`;
+    renderAlertaGlobal(); return;
+  }
+  vis.forEach(p=>list.appendChild(buildCard(p)));
   renderAlertaGlobal();
 }
 function renderAlertaGlobal(){
   const box=document.getElementById('alertaGlobal');
-  const afect = products.filter(p=>{ const ct=cambioTasa(p); return ct && ct.subio; });
+  const afect=products.filter(p=>{ const ct=cambioTasa(p); return ct&&ct.subio; });
   if(afect.length===0){ box.classList.remove('show'); box.innerHTML=''; return; }
   const n=afect.length;
-  box.innerHTML = `⚠️ <b>El dólar subió desde que cargaste ${n>1?'estos productos':'este producto'}.</b> ${n} producto${n>1?'s':''} cargado${n>1?'s':''} en Bs ${n>1?'están':'está'} quedando por debajo de su costo de reposición. Abajo te digo a cuánto ${n>1?'deberían':'debería'} estar.`;
+  box.innerHTML=`⚠️ <b>El dólar subió desde que cargaste ${n>1?'estos productos':'este producto'}.</b> ${n} producto${n>1?'s':''} cargado${n>1?'s':''} en Bs ${n>1?'están':'está'} quedando por debajo de su costo de reposición. Abajo te digo a cuánto ${n>1?'deberían':'debería'} estar.`;
   box.classList.add('show');
 }
 function replaceCard(node,p){ const n=buildCard(p); node.replaceWith(n); return n; }
@@ -355,12 +509,11 @@ function buildCard(p){
   return card;
 }
 
-/* ---------- VISTA ---------- */
 function renderView(card,p){
   const c=compute(p), ct=cambioTasa(p);
-  if(ct && ct.subio) card.classList.add('alert');
-  const costoTxt = p.cur==='usd' ? usd(Number(p.monto)||0) : bs(Number(p.monto)||0);
-  const colchTxt = c.colch>0 ? ` · colchón +${bs(c.colch)}` : '';
+  if(ct&&ct.subio) card.classList.add('alert');
+  const costoTxt = p.cur==='usd'?usd(Number(p.monto)||0):bs(Number(p.monto)||0);
+  const colchTxt = c.colch>0?` · colchón +${bs(c.colch)}`:'';
   card.innerHTML=`
     <div class="vhead">
       <p class="pname">${escapeHtml(p.name||'Sin nombre')}</p>
@@ -381,37 +534,38 @@ function renderView(card,p){
     </div>`;
   const q=s=>card.querySelector(`[data-o="${s}"]`);
   q('unitbs').textContent=bs(c.unitBs); q('unitusd').textContent=usd(c.unitUSD);
-  q('cant').textContent=c.cant; q('plural').textContent = c.cant===1?'':'es';
+  q('cant').textContent=c.cant; q('plural').textContent=c.cant===1?'':'es';
   q('totalbs').textContent=bs(c.totalBs); q('totalusd').textContent=usd(c.totalUSD);
-
   if(ct){
     const d=new Date(ct.ts), f=!isNaN(d)?d.toLocaleDateString('es-VE',{day:'2-digit',month:'short'}):'';
-    const verbo = ct.subio ? 'subió' : 'bajó';
     card.querySelector('[data-rc]').innerHTML=`
       ${ct.subio?'⚠️':'ℹ️'} <b>La tasa del dólar cambió.</b> Cargaste este producto${f?' el '+f:''} con el dólar a
-      ${fmtRate.format(ct.tasaAntes)} y hoy ${verbo} a ${fmtRate.format(ct.tasaHoy)} (${ct.pct.toFixed(1)}%).
+      ${fmtRate.format(ct.tasaAntes)} y hoy ${ct.subio?'subió':'bajó'} a ${fmtRate.format(ct.tasaHoy)} (${ct.pct.toFixed(1)}%).
       <div class="cmp">
         Costo cargado: ${bs(ct.montoAntes)} = ${usd(ct.montoUSD)}<br>
         Esos ${usd(ct.montoUSD)} hoy son: <span class="now">${bs(ct.nuevoMontoBs)}</span>
       </div>
       <button class="act">Actualizar costo a ${bs(ct.nuevoMontoBs)}</button>`;
-    card.querySelector('.act').addEventListener('click', ()=>{
-      p.monto = Number(ct.nuevoMontoBs.toFixed(2));
-      const nc = compute(p);
-      p.snap = { rate, costoBs:nc.costoBs, costoUSD:nc.costoUSD, unitBs:nc.unitBs, unitUSD:nc.unitUSD, ts:new Date().toISOString() };
-      saveProducts(); replaceCard(card,p); renderAlertaGlobal();
+    card.querySelector('.act').addEventListener('click', async (e)=>{
+      e.target.disabled=true;
+      p.monto=Number(ct.nuevoMontoBs.toFixed(2));
+      const nc=compute(p);
+      p.snap={ rate, costoUSD:nc.costoUSD, ts:new Date().toISOString() };
+      await subirProducto(p);
+      replaceCard(card,p); renderAlertaGlobal();
     });
   }
   card.querySelector('.editbtn').addEventListener('click', ()=>{
-    p._backup = JSON.parse(JSON.stringify((()=>{const o={};for(const k in p){if(!k.startsWith('_'))o[k]=p[k];}return o;})()));
-    p._new=false; p.saved=false; saveProducts(); replaceCard(card,p); renderAlertaGlobal();
+    p._backup=JSON.parse(JSON.stringify((()=>{const o={};for(const k in p){if(!k.startsWith('_'))o[k]=p[k];}return o;})()));
+    p._new=false; p.saved=false; cacheLocal(); replaceCard(card,p); renderAlertaGlobal();
   });
-  card.querySelector('.delbtn').addEventListener('click', ()=>{
-    products=products.filter(x=>x!==p); saveProducts(); renderList();
+  card.querySelector('.delbtn').addEventListener('click', async (e)=>{
+    e.target.disabled=true;
+    await borrarProducto(p.id);
+    products=products.filter(x=>x!==p); cacheLocal(); renderList();
   });
 }
 
-/* ---------- EDITOR ---------- */
 const GAN_CHIPS=[20,30,40,50], COLCH_CHIPS=[10,20,30];
 function renderEditor(card,p){
   if(!p.cur) p.cur='bs';
@@ -419,7 +573,6 @@ function renderEditor(card,p){
   card.innerHTML=`
     <div class="block"><label>1 · Producto</label>
       <input data-f="name" type="text" placeholder="Nombre" value="${escapeAttr(p.name||'')}" /></div>
-
     <div class="block"><label>2 · Costo de una unidad</label>
       <div class="montoline">
         <input data-f="monto" class="num" type="number" inputmode="decimal" step="0.01" placeholder="0,00" value="${p.monto ?? ''}" />
@@ -427,7 +580,6 @@ function renderEditor(card,p){
       </div>
       <div class="equiv" data-o="equiv">—</div>
       <div class="hint">Lo que te cuesta <b>una sola unidad</b>. Escríbelo en Bs o en $: la app convierte con la tasa del BCV.</div></div>
-
     <div class="duo block">
       <div><label>3 · Cantidad que tienes</label>
         <input data-f="cant" class="num" type="number" inputmode="numeric" step="1" placeholder="1" value="${p.cant ?? 1}" />
@@ -436,12 +588,10 @@ function renderEditor(card,p){
         <label class="ivatoggle"><input data-f="iva" type="checkbox" ${p.iva?'checked':''}/><small>¿Lleva IVA?</small></label>
         <div class="hint">Márcalo solo si el producto es gravado.</div></div>
     </div>
-
     <div class="block"><label>5 · Margen de ganancia</label>
       <div class="chips" data-ganchips>${GAN_CHIPS.map(v=>`<button class="chip" data-gan="${v}">${v}%</button>`).join('')}</div>
       <input data-f="gan" class="num" type="number" inputmode="decimal" step="1" placeholder="40" value="${p.gan ?? ''}" />
       <div class="hint">Toca un atajo o escribe el que quieras. Súbelo si tiene poca competencia, bájalo si hay mucha.</div></div>
-
     <div class="colch ${colchOpen?'on':'closed'}" data-colch>
       <div class="head" data-colchhead>
         <span class="t">🛡️ Agregar monto para protección de ganancias</span>
@@ -456,7 +606,6 @@ function renderEditor(card,p){
         <div class="hint">Bs fijos que se suman <b>a cada unidad</b> al final. Tu colchón por si el dólar sube antes de vender.</div>
       </div>
     </div>
-
     <div class="steps">
       <div class="step"><span class="n">1</span><span class="txt"><span class="k">Costo de la unidad</span><span class="d">lo que te cuesta a ti</span></span><span class="v" data-o="costo">—</span></div>
       <div class="step plus" data-ivarow><span class="n">2</span><span class="txt"><span class="k">+ IVA <span data-o="ivapct"></span></span><span class="d">sobre el costo</span></span><span class="v" data-o="iva">—</span></div>
@@ -471,7 +620,6 @@ function renderEditor(card,p){
         <span class="v"><span class="bs" data-o="totalbs">—</span><span class="usd" data-o="totalusd">—</span></span>
       </div>
     </div>
-
     <div class="warnmsg" data-warn>Escribe el costo de la unidad para poder guardar.</div>
     <div class="btnrow">
       <button class="btn btn-primary savebtn">✓ Guardar</button>
@@ -481,14 +629,14 @@ function renderEditor(card,p){
   const curBtns=card.querySelectorAll('.curtoggle button');
   const setCur=()=>curBtns.forEach(b=>b.classList.toggle('on', b.dataset.cur===p.cur));
   setCur();
-  curBtns.forEach(b=>b.addEventListener('click', ()=>{ p.cur=b.dataset.cur; setCur(); saveProducts(); recalcCard(card,p); }));
+  curBtns.forEach(b=>b.addEventListener('click',()=>{ p.cur=b.dataset.cur; setCur(); cacheLocal(); recalcCard(card,p); }));
 
   const ganChips=card.querySelectorAll('[data-ganchips] .chip');
   const syncGan=()=>ganChips.forEach(b=>b.classList.toggle('on', Number(b.dataset.gan)===Number(p.gan)));
   syncGan();
-  ganChips.forEach(b=>b.addEventListener('click', ()=>{
+  ganChips.forEach(b=>b.addEventListener('click',()=>{
     p.gan=Number(b.dataset.gan); card.querySelector('[data-f="gan"]').value=p.gan;
-    syncGan(); saveProducts(); recalcCard(card,p);
+    syncGan(); cacheLocal(); recalcCard(card,p);
   }));
 
   const colchBox=card.querySelector('[data-colch]');
@@ -498,44 +646,47 @@ function renderEditor(card,p){
     const v=Number(p.colchon)||0;
     colchChips.forEach(b=>b.classList.toggle('on', Number(b.dataset.colch)===v));
     colchBox.classList.toggle('on', v>0);
-    card.querySelector('[data-colchst]').textContent = v>0 ? '+ '+bs(v) : 'Opcional';
+    card.querySelector('[data-colchst]').textContent = v>0?'+ '+bs(v):'Opcional';
   };
   syncColch();
-  card.querySelector('[data-colchhead]').addEventListener('click', ()=>colchBox.classList.toggle('closed'));
-  colchChips.forEach(b=>b.addEventListener('click', ()=>{
+  card.querySelector('[data-colchhead]').addEventListener('click',()=>colchBox.classList.toggle('closed'));
+  colchChips.forEach(b=>b.addEventListener('click',()=>{
     const v=Number(b.dataset.colch);
     p.colchon = v===0?'':v; colchInput.value=p.colchon;
-    syncColch(); saveProducts(); recalcCard(card,p);
+    syncColch(); cacheLocal(); recalcCard(card,p);
   }));
 
   card.querySelectorAll('input[data-f]').forEach(inp=>{
     const f=inp.dataset.f, ev=inp.type==='checkbox'?'change':'input';
-    inp.addEventListener(ev, ()=>{
+    inp.addEventListener(ev,()=>{
       p[f]= inp.type==='checkbox'?inp.checked:inp.value;
       inp.classList.remove('err');
       if(f==='iva'){ const ivt=card.querySelector('.ivatoggle'); if(ivt) ivt.classList.toggle('active', inp.checked); }
       if(f==='gan') syncGan();
       if(f==='colchon') syncColch();
-      saveProducts(); recalcCard(card,p);
+      cacheLocal(); recalcCard(card,p);
     });
   });
   const ivt=card.querySelector('.ivatoggle'); if(ivt) ivt.classList.toggle('active', !!p.iva);
 
-  card.querySelector('.savebtn').addEventListener('click', ()=>{
+  card.querySelector('.savebtn').addEventListener('click', async (e)=>{
     if(!((Number(p.monto)||0)>0)){
       card.querySelector('[data-warn]').classList.add('show');
       card.querySelector('[data-f="monto"]').classList.add('err');
       return;
     }
     if(!(Number(p.cant)>0)) p.cant=1;
+    const btn=e.target; btn.disabled=true; btn.textContent='Guardando…';
     const c=compute(p);
-    if(rate) p.snap={ rate, costoBs:c.costoBs, costoUSD:c.costoUSD, unitBs:c.unitBs, unitUSD:c.unitUSD, ts:new Date().toISOString() };
-    p.saved=true; delete p._new; delete p._backup; saveProducts(); replaceCard(card,p); renderAlertaGlobal();
+    if(rate) p.snap={ rate, costoUSD:c.costoUSD, ts:new Date().toISOString() };
+    p.saved=true; delete p._new; delete p._backup;
+    await subirProducto(p);
+    replaceCard(card,p); renderAlertaGlobal();
   });
-  card.querySelector('.cancelbtn').addEventListener('click', ()=>{
-    if(p._new){ products=products.filter(x=>x!==p); saveProducts(); renderList(); return; }
+  card.querySelector('.cancelbtn').addEventListener('click', async ()=>{
+    if(p._new){ products=products.filter(x=>x!==p); cacheLocal(); renderList(); return; }
     if(p._backup){ for(const k in p){ if(!k.startsWith('_')) delete p[k]; } Object.assign(p,p._backup); }
-    p.saved=true; delete p._new; delete p._backup; saveProducts(); replaceCard(card,p); renderAlertaGlobal();
+    p.saved=true; delete p._new; delete p._backup; cacheLocal(); replaceCard(card,p); renderAlertaGlobal();
   });
   recalcCard(card,p);
 }
@@ -549,42 +700,92 @@ function recalcCard(card,p){
     else if(p.cur==='usd') eq.textContent='= '+bs(c.costoBs)+' a la tasa de hoy';
     else eq.textContent='= '+usd(c.costoUSD)+' a la tasa de hoy';
   }
-  set('costo', bs(c.costoBs));
-  set('ivapct', (Number(settings.iva)||0)+'%');
-  set('ganpct', ganDe(p)+'%');
-  set('iva', bs(c.ivaBs));
-  set('gan', bs(c.ganBs));
-  set('colch', bs(c.colch));
-  set('unitbs', bs(c.unitBs));
-  set('unitusd', usd(c.unitUSD));
-  set('cant', c.cant);
-  set('plural', c.cant===1?'':'es');
-  set('totalbs', bs(c.totalBs));
-  set('totalusd', usd(c.totalUSD));
-  const ivarow=card.querySelector('[data-ivarow]'); if(ivarow) ivarow.classList.toggle('hide', !p.iva);
-  const colchrow=card.querySelector('[data-colchrow]'); if(colchrow) colchrow.classList.toggle('hide', !(c.colch>0));
+  set('costo',bs(c.costoBs)); set('ivapct',(Number(settings.iva)||0)+'%'); set('ganpct',ganDe(p)+'%');
+  set('iva',bs(c.ivaBs)); set('gan',bs(c.ganBs)); set('colch',bs(c.colch));
+  set('unitbs',bs(c.unitBs)); set('unitusd',usd(c.unitUSD));
+  set('cant',c.cant); set('plural',c.cant===1?'':'es');
+  set('totalbs',bs(c.totalBs)); set('totalusd',usd(c.totalUSD));
+  const ivarow=card.querySelector('[data-ivarow]'); if(ivarow) ivarow.classList.toggle('hide',!p.iva);
+  const colchrow=card.querySelector('[data-colchrow]'); if(colchrow) colchrow.classList.toggle('hide',!(c.colch>0));
 }
-function recalcAll(){ renderList(); }
 
-document.getElementById('addBtn').addEventListener('click', ()=>{
-  const p={ id:Date.now(), name:'', monto:'', cur:'bs', cant:1, iva:true,
+/* ---------- buscador ---------- */
+const searchBar=document.getElementById('searchBar'), searchInput=document.getElementById('searchInput');
+document.getElementById('searchBtn').addEventListener('click',()=>{
+  const abierto=searchBar.classList.toggle('show');
+  document.getElementById('searchBtn').classList.toggle('on', abierto);
+  if(abierto) searchInput.focus();
+  else { searchInput.value=''; filtro=''; renderList(); }
+});
+searchInput.addEventListener('input',()=>{ filtro=searchInput.value; renderList(); });
+document.getElementById('searchClear').addEventListener('click',()=>{
+  searchInput.value=''; filtro=''; renderList(); searchInput.focus();
+});
+
+/* ---------- acciones ---------- */
+document.getElementById('addBtn').addEventListener('click',()=>{
+  if(filtro){ filtro=''; searchInput.value=''; }
+  const p={ id:uuid(), name:'', monto:'', cur:'bs', cant:1, iva:true,
             gan:Number(settings.gan)||40, colchon:'', saved:false, _new:true };
-  products.push(p); saveProducts();
-  if(products.length===1) renderList(); else list.appendChild(buildCard(p));
+  products.push(p); cacheLocal(); renderList();
   const cards=list.querySelectorAll('.card'), last=cards[cards.length-1];
   if(last){ last.scrollIntoView({behavior:'smooth',block:'center'}); const fi=last.querySelector('input'); if(fi) fi.focus(); }
 });
-document.getElementById('refreshBtn').addEventListener('click', ()=>fetchRate(true));
-const ivaInput=document.getElementById('ivaInput'); ivaInput.value=settings.iva;
-ivaInput.addEventListener('input', ()=>{ settings.iva=ivaInput.value; saveSettings(); recalcAll(); });
-const ganInput=document.getElementById('ganInput'); ganInput.value=settings.gan;
-ganInput.addEventListener('input', ()=>{ settings.gan=ganInput.value; saveSettings(); });
+document.getElementById('refreshBtn').addEventListener('click',()=>fetchRate(true));
+const ivaInput=document.getElementById('ivaInput');
+ivaInput.addEventListener('input',()=>{ settings.iva=ivaInput.value; subirAjustes(); renderList(); });
+const ganInput=document.getElementById('ganInput');
+ganInput.addEventListener('input',()=>{ settings.gan=ganInput.value; subirAjustes(); });
 
-document.addEventListener('visibilitychange', ()=>{ if(!document.hidden) fetchRate(false); });
+/* ---------- login ---------- */
+const gate=document.getElementById('gate'), app=document.getElementById('app');
+async function entrarApp(){
+  gate.classList.remove('show'); app.classList.add('show');
+  document.getElementById('modoTag').textContent = MODO==='nube'?'nube':'local';
+  document.getElementById('modoTag').classList.toggle('nube', MODO==='nube');
+  if(user){
+    document.getElementById('whoTag').textContent=user.email||'';
+    document.getElementById('outBtn').style.display='';
+  }
+  renderRate(); renderList(); fetchRate(false);
+  if(MODO==='nube' && user){
+    await bajarTodo();
+    sb.channel('productos-live')
+      .on('postgres_changes',{event:'*',schema:'public',table:'productos'},()=>{ if(!products.some(p=>!p.saved)) bajarTodo(); })
+      .subscribe();
+  }
+}
+document.getElementById('gBtn').addEventListener('click', async ()=>{
+  const btn=document.getElementById('gBtn'), msg=document.getElementById('gMsg');
+  const email=document.getElementById('gEmail').value.trim(), pass=document.getElementById('gPass').value;
+  if(!email||!pass){ msg.textContent='Escribe tu correo y tu clave.'; return; }
+  btn.disabled=true; btn.textContent='Entrando…'; msg.textContent='';
+  const { data, error } = await sb.auth.signInWithPassword({ email, password: pass });
+  btn.disabled=false; btn.textContent='Entrar';
+  if(error){ msg.textContent = /invalid/i.test(error.message)?'Correo o clave incorrectos.':error.message; return; }
+  user=data.user; entrarApp();
+});
+document.getElementById('gPass').addEventListener('keydown',e=>{ if(e.key==='Enter') document.getElementById('gBtn').click(); });
+document.getElementById('outBtn').addEventListener('click', async ()=>{
+  await sb.auth.signOut();
+  store.set('bcv_products','[]');
+  location.reload();
+});
+
+document.addEventListener('visibilitychange',()=>{ if(!document.hidden){ fetchRate(false); if(MODO==='nube'&&user&&!products.some(p=>!p.saved)) bajarTodo(); } });
 setInterval(()=>fetchRate(false), 30*60*1000);
 
-loadState(); renderRate(); renderList(); fetchRate(false);
-if('serviceWorker' in navigator){ window.addEventListener('load', ()=> navigator.serviceWorker.register('sw.js').catch(()=>{})); }
+/* ---------- boot ---------- */
+cargarCache();
+ivaInput.value=settings.iva; ganInput.value=settings.gan;
+if(MODO==='nube'){
+  const { data } = await sb.auth.getSession();
+  if(data.session){ user=data.session.user; entrarApp(); }
+  else { gate.classList.add('show'); }
+}else{
+  entrarApp();   // sin config de Supabase: modo local, sin login
+}
+if('serviceWorker' in navigator){ window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{})); }
 </script>
 </body>
 </html>
