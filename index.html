@@ -206,9 +206,10 @@
 <div id="gate">
   <div class="box">
     <h2>Costos <span style="color:var(--gold)">BCV</span></h2>
-    <p class="s">Entra con el correo que te dieron.</p>
-    <div class="f"><label for="gEmail">Correo</label>
-      <input id="gEmail" type="email" inputmode="email" autocomplete="username" placeholder="tu@correo.com" /></div>
+    <p class="s">Entra con el usuario y la clave que te dieron.</p>
+    <div class="f"><label for="gUser">Usuario</label>
+      <input id="gUser" type="text" autocapitalize="none" autocorrect="off" spellcheck="false"
+             autocomplete="username" placeholder="usuario1" /></div>
     <div class="f"><label for="gPass">Clave</label>
       <input id="gPass" type="password" autocomplete="current-password" placeholder="••••••••" /></div>
     <button class="btn btn-primary" id="gBtn" style="width:100%; margin-top:6px">Entrar</button>
@@ -301,9 +302,13 @@
    dispositivo (modo local), sin sincronizar.
    ============================================================ */
 const CFG = {
-  url: 'https://gnqlpgmqeydynssjdehz.supabase.co/rest/v1/',   // ej: https://abcdefgh.supabase.co
-  key: 'sb_publishable_1XaECJ826j-aipVEhYR15Q_sBVPe7wn'       // la clave anon / publishable (es pública, va aquí)
+  // OJO: solo la base, SIN /rest/v1/ al final. La librería arma las rutas sola.
+  url: 'https://gnqlpgmqeydynssjdehz.supabase.co',
+  key: 'sb_publishable_1XaECJ826j-aipVEhYR15Q_sBVPe7wn'
 };
+// Los usuarios entran con "usuario1" y por dentro se convierte en
+// "usuario1@costosbcv.app". Supabase siempre necesita un correo; esto lo esconde.
+const DOMINIO = '@costosbcv.app';
 
 /* ---------- utilidades ---------- */
 const mem={};
@@ -320,7 +325,7 @@ const safeParse=s=>{ try{ return JSON.parse(s); }catch(e){ return null; } };
 const norm=s=>String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim();
 const uuid=()=>{ try{ return crypto.randomUUID(); }catch(e){ return 'x'+Date.now()+Math.random().toString(16).slice(2); } };
 
-let rate=0, fecha='', fuente='';
+let rate=0, fecha='', fuente='', consultada='';
 let products=[], settings={iva:16,gan:40}, filtro='';
 let sb=null, user=null, MODO='local';
 
@@ -411,7 +416,7 @@ function cargarCache(){
     if(!p.id) p.id=uuid();
   });
   const c=safeParse(store.get('bcv_rate_cache'));
-  if(c){ rate=c.rate; fecha=c.fecha; fuente=c.fuente; }
+  if(c){ rate=c.rate; fecha=c.fecha; fuente=c.fuente; consultada=c.consultada||''; }
 }
 
 /* ---------- tasa BCV ---------- */
@@ -419,13 +424,17 @@ async function fetchRate(manual){
   const btn=document.getElementById('refreshBtn'), dot=document.getElementById('statusDot');
   if(manual) btn.classList.add('spin');
   try{
-    const r=await fetch('https://ve.dolarapi.com/v1/dolares/oficial',{cache:'no-store'});
+    // ?_=<timestamp> obliga a que sea una URL nueva: ni el navegador ni ningún
+    // proxy intermedio pueden devolver una respuesta guardada de antes.
+    const r=await fetch('https://ve.dolarapi.com/v1/dolares/oficial?_='+Date.now(),
+      { cache:'no-store', headers:{ 'Cache-Control':'no-cache', 'Pragma':'no-cache' } });
     if(!r.ok) throw new Error('http '+r.status);
     const d=await r.json();
     const val=d.promedio ?? d.venta ?? d.compra;
     if(!val) throw new Error('sin valor');
     rate=Number(val); fecha=d.fechaActualizacion||new Date().toISOString(); fuente='DolarAPI';
-    store.set('bcv_rate_cache', JSON.stringify({rate,fecha,fuente}));
+    consultada=new Date().toISOString();
+    store.set('bcv_rate_cache', JSON.stringify({rate,fecha,fuente,consultada}));
     dot.className='dot live'; renderRate(); renderList();
   }catch(err){
     dot.className = rate?'dot live':'dot err';
@@ -433,13 +442,28 @@ async function fetchRate(manual){
     console.warn('No se pudo actualizar la tasa:', err);
   }finally{ if(manual) setTimeout(()=>btn.classList.remove('spin'),500); }
 }
+function haceCuanto(iso){
+  const t=new Date(iso).getTime();
+  if(!t||isNaN(t)) return '';
+  const m=Math.floor((Date.now()-t)/60000);
+  if(m<1) return 'hace un momento';
+  if(m<60) return 'hace '+m+' min';
+  const h=Math.floor(m/60);
+  if(h<24) return 'hace '+h+' h';
+  return 'hace '+Math.floor(h/24)+' d';
+}
 function renderRate(){
   document.getElementById('rateVal').textContent = rate?fmtRate.format(rate):'—';
   document.getElementById('fuente').textContent = fuente||'—';
   const f=document.getElementById('fecha');
-  if(fecha){ const dt=new Date(fecha);
-    f.textContent = !isNaN(dt)?'Actualizado '+dt.toLocaleString('es-VE',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}):'Última tasa conocida';
-  } else f.textContent='Sin datos aún';
+  if(!rate){ f.textContent='Sin datos aún'; return; }
+  // Dos datos distintos que antes se confundían en uno:
+  //  - vigencia: el día para el que rige esta tasa del BCV
+  //  - consulta: cuándo fue la última vez que la app se lo preguntó a la API
+  const dt=new Date(fecha);
+  const vig = !isNaN(dt) ? 'Tasa vigente '+dt.toLocaleDateString('es-VE',{day:'2-digit',month:'short'}) : 'Última tasa conocida';
+  const con = consultada ? ' · consultada '+haceCuanto(consultada) : '';
+  f.textContent = vig + con;
 }
 
 /* ---------- fórmula ---------- */
@@ -744,7 +768,7 @@ async function entrarApp(){
   document.getElementById('modoTag').textContent = MODO==='nube'?'nube':'local';
   document.getElementById('modoTag').classList.toggle('nube', MODO==='nube');
   if(user){
-    document.getElementById('whoTag').textContent=user.email||'';
+    document.getElementById('whoTag').textContent=(user.email||'').replace(DOMINIO,'');
     document.getElementById('outBtn').style.display='';
   }
   renderRate(); renderList(); fetchRate(false);
@@ -757,12 +781,13 @@ async function entrarApp(){
 }
 document.getElementById('gBtn').addEventListener('click', async ()=>{
   const btn=document.getElementById('gBtn'), msg=document.getElementById('gMsg');
-  const email=document.getElementById('gEmail').value.trim(), pass=document.getElementById('gPass').value;
-  if(!email||!pass){ msg.textContent='Escribe tu correo y tu clave.'; return; }
+  const u=document.getElementById('gUser').value.trim().toLowerCase(), pass=document.getElementById('gPass').value;
+  if(!u||!pass){ msg.textContent='Escribe tu usuario y tu clave.'; return; }
+  const email = u.includes('@') ? u : u + DOMINIO;   // usuario1 -> usuario1@costosbcv.app
   btn.disabled=true; btn.textContent='Entrando…'; msg.textContent='';
   const { data, error } = await sb.auth.signInWithPassword({ email, password: pass });
   btn.disabled=false; btn.textContent='Entrar';
-  if(error){ msg.textContent = /invalid/i.test(error.message)?'Correo o clave incorrectos.':error.message; return; }
+  if(error){ msg.textContent = /invalid/i.test(error.message)?'Usuario o clave incorrectos.':error.message; return; }
   user=data.user; entrarApp();
 });
 document.getElementById('gPass').addEventListener('keydown',e=>{ if(e.key==='Enter') document.getElementById('gBtn').click(); });
