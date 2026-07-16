@@ -131,7 +131,7 @@
     width:26px; height:26px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:1rem}
 
   .card{background:var(--surface); border:1px solid var(--line); border-radius:14px; padding:13px; margin-bottom:12px; overflow:hidden}
-  .card.saved{border-color:#33405A}
+  .card.saved{border-color:#33405A; overflow:visible}
   .card.alert{border-color:rgba(224,163,62,.55)}
   .block{margin-bottom:13px}
   .montoline{display:flex; gap:8px; align-items:stretch}
@@ -192,8 +192,29 @@
   .totalrow .v .bs{color:var(--text); display:block}
   .totalrow .v .usd{color:var(--muted); font-size:.75rem}
 
+  .vhead{display:flex; justify-content:space-between; align-items:flex-start; gap:8px}
+  .vhead .txt{flex:1 1 auto; min-width:0}
   .vhead .pname{font-family:var(--disp); font-size:1.05rem; font-weight:600; margin:0; word-break:break-word}
   .vhead .pmeta{font-family:var(--mono); font-size:.73rem; color:var(--muted); margin:4px 0 0; line-height:1.55}
+  /* menú de 3 puntos */
+  .kebab{position:relative; flex:none}
+  .kebab .dots{width:36px; height:36px; margin:-4px -6px 0 0; border-radius:10px; color:var(--muted);
+    display:flex; align-items:center; justify-content:center}
+  .kebab .dots:active,.kebab.open .dots{background:var(--surface-2); color:var(--text)}
+  .kebab .menu{position:absolute; right:0; top:34px; z-index:40; min-width:158px;
+    background:var(--surface-2); border:1px solid var(--line); border-radius:12px; overflow:hidden;
+    box-shadow:0 12px 30px rgba(0,0,0,.55); display:none}
+  .kebab.open .menu{display:block}
+  .kebab .menu button{display:flex; align-items:center; gap:10px; width:100%; text-align:left;
+    padding:13px 14px; font-size:.86rem; color:var(--text)}
+  .kebab .menu button:active{background:var(--surface)}
+  .kebab .menu button.dl{color:var(--danger); border-top:1px solid var(--line)}
+  .kebab .menu svg{flex:none; opacity:.75}
+  /* confirmación de borrado */
+  .confirm{margin-top:12px; border-top:1px solid var(--line); padding-top:12px; display:none}
+  .confirm.show{display:block}
+  .confirm p{margin:0 0 10px; font-size:.82rem; color:var(--text); line-height:1.5}
+  .confirm p b{color:var(--danger)}
 
   .rc{margin-top:12px; border-radius:11px; padding:11px 12px; font-size:.77rem; line-height:1.55;
     border:1px solid rgba(224,163,62,.4); background:rgba(224,163,62,.08); display:none}
@@ -740,8 +761,25 @@ function renderView(card,p){
   const colchTxt = c.colch>0?` · colchón +${bs(c.colch)}`:'';
   card.innerHTML=`
     <div class="vhead">
-      <p class="pname">${escapeHtml(p.name||'Sin nombre')}</p>
-      <p class="pmeta">Costo unidad ${costoTxt} · ${p.iva?'con IVA':'sin IVA'} · ganancia ${ganDe(p)}%${colchTxt}</p>
+      <div class="txt">
+        <p class="pname">${escapeHtml(p.name||'Sin nombre')}</p>
+        <p class="pmeta">Costo unidad ${costoTxt} · ${p.iva?'con IVA':'sin IVA'} · ganancia ${ganDe(p)}%${colchTxt}</p>
+      </div>
+      <div class="kebab" data-kebab>
+        <button class="dots" aria-label="Opciones" aria-haspopup="true" aria-expanded="false">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg>
+        </button>
+        <div class="menu" role="menu">
+          <button class="editbtn" role="menuitem">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+            Editar
+          </button>
+          <button class="dl delbtn" role="menuitem">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M19 6l-1 14H6L5 6"/></svg>
+            Eliminar
+          </button>
+        </div>
+      </div>
     </div>
     <div class="final">
       <span class="k">Precio final<small>por unidad</small></span>
@@ -753,9 +791,12 @@ function renderView(card,p){
     </div>
     <div class="prev" data-prev></div>
     <div class="rc ${ct?'show':''} ${ct&&!ct.subioPrecio?'down':''}" data-rc></div>
-    <div class="btnrow">
-      <button class="btn btn-ghost editbtn">Editar</button>
-      <button class="btn btn-danger delbtn">Eliminar</button>
+    <div class="confirm" data-confirm>
+      <p>¿Eliminar <b>${escapeHtml(p.name||'este producto')}</b>? Se borra para todos los dispositivos y no se puede deshacer.</p>
+      <div class="btnrow">
+        <button class="btn btn-danger sibtn">Sí, eliminar</button>
+        <button class="btn btn-ghost nobtn">Cancelar</button>
+      </div>
     </div>`;
   const q=s=>card.querySelector(`[data-o="${s}"]`);
   q('unitbs').textContent=bs(c.unitBs); q('unitusd').innerHTML=otrasMonedas(c.unitBs,'bs');
@@ -789,16 +830,55 @@ function renderView(card,p){
       replaceCard(card,p); renderAlertaGlobal();
     });
   }
+  // ---- menú de 3 puntos ----
+  const kebab=card.querySelector('[data-kebab]');
+  const dots=kebab.querySelector('.dots');
+  const cerrarMenu=()=>{ kebab.classList.remove('open'); dots.setAttribute('aria-expanded','false'); };
+  dots.addEventListener('click', e=>{
+    e.stopPropagation();                        // si no, el listener de "clic afuera" lo cierra al instante
+    cerrarTodosLosMenus(kebab);                 // solo un menú abierto a la vez
+    const abierto=kebab.classList.toggle('open');
+    dots.setAttribute('aria-expanded', abierto?'true':'false');
+  });
+  kebab.querySelector('.menu').addEventListener('click', e=>e.stopPropagation());
+
   card.querySelector('.editbtn').addEventListener('click', ()=>{
+    cerrarMenu();
     p._backup=JSON.parse(JSON.stringify((()=>{const o={};for(const k in p){if(!k.startsWith('_'))o[k]=p[k];}return o;})()));
     p._new=false; p.saved=false; cacheLocal(); replaceCard(card,p); renderAlertaGlobal();
   });
-  card.querySelector('.delbtn').addEventListener('click', async (e)=>{
-    e.target.disabled=true;
-    await borrarProducto(p.id);
+
+  // ---- borrar: dos pasos, porque la lista es compartida ----
+  const conf=card.querySelector('[data-confirm]');
+  card.querySelector('.delbtn').addEventListener('click', ()=>{
+    cerrarMenu();
+    conf.classList.add('show');
+    conf.scrollIntoView({behavior:'smooth', block:'nearest'});
+  });
+  card.querySelector('.nobtn').addEventListener('click', ()=>conf.classList.remove('show'));
+  card.querySelector('.sibtn').addEventListener('click', async (e)=>{
+    const b=e.currentTarget;
+    b.disabled=true; card.querySelector('.nobtn').disabled=true; b.textContent='Eliminando…';
+    const ok=await borrarProducto(p.id);
+    if(!ok){   // falló la nube: no se borra de la lista, para no perderlo de vista
+      b.disabled=false; card.querySelector('.nobtn').disabled=false; b.textContent='Sí, eliminar';
+      conf.classList.remove('show');
+      return;
+    }
     products=products.filter(x=>x!==p); cacheLocal(); renderList();
   });
 }
+
+// Un solo menú abierto a la vez, y se cierra al tocar en cualquier otro lado.
+function cerrarTodosLosMenus(salvo){
+  document.querySelectorAll('.kebab.open').forEach(k=>{
+    if(k===salvo) return;
+    k.classList.remove('open');
+    const d=k.querySelector('.dots'); if(d) d.setAttribute('aria-expanded','false');
+  });
+}
+document.addEventListener('click', ()=>cerrarTodosLosMenus(null));
+document.addEventListener('keydown', e=>{ if(e.key==='Escape') cerrarTodosLosMenus(null); });
 
 const GAN_CHIPS=[20,30,40,50], COLCH_CHIPS=[10,20,30];
 function renderEditor(card,p){
