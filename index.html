@@ -86,6 +86,18 @@
     border-radius:13px; padding:12px 13px; font-size:.83rem; line-height:1.5}
   .alerta.show{display:block}
   .alerta b{color:var(--warn)}
+  .alerta .act{display:block; width:100%; margin-top:11px; text-align:center; padding:11px; border-radius:10px;
+    font-size:.84rem; font-weight:600; background:var(--gold); color:#1a1305}
+  .alerta .act:active{transform:scale(.98)}
+  .alerta .act[disabled]{opacity:.55}
+  .alerta .cmp2{font-size:.73rem; color:var(--muted); margin-top:8px}
+  .rc .rcno{font-size:.71rem; color:var(--muted); margin-top:7px; text-align:center}
+  .alerta.info{border-color:rgba(89,195,155,.4); background:rgba(89,195,155,.08)}
+  .alerta.info b{color:var(--pos)}
+  .alerta.info .act{background:var(--surface-2); border:1px solid var(--line); color:var(--text)}
+  .prev{margin-top:9px; font-family:var(--mono); font-size:.72rem; color:var(--muted); line-height:1.5}
+  .prev .up{color:var(--warn)} .prev .down{color:var(--pos)}
+  .prev s{color:#5C6779}
   .neterr{display:none; margin-top:12px; border:1px solid rgba(228,105,91,.4); background:rgba(228,105,91,.08);
     border-radius:13px; padding:11px 13px; font-size:.8rem; line-height:1.5}
   .neterr.show{display:block}
@@ -282,6 +294,10 @@
   <div><label for="ganInput">Ganancia % por defecto</label>
     <input id="ganInput" class="num" type="number" inputmode="decimal" step="1" value="40" />
     <div class="hint">Sugerida al crear. Cada producto lleva la suya.</div></div>
+  <div style="grid-column:1/-1">
+    <label class="ivatoggle" style="padding:13px"><input id="autoChk" type="checkbox"/><small>Actualizar los precios solo, cuando cambie la tasa</small></label>
+    <div class="hint">Encendido: los precios siguen la tasa sin preguntar nada. Apagado: la app te avisa cuánto cambiaría y decides tú.</div>
+  </div>
   <div style="grid-column:1/-1"><label>Tasa del USDT · ¿cuál lado del P2P?</label>
     <div class="seg" id="segUsdt">
       <button data-lado="ask">Lo que pagas por 1 USDT</button>
@@ -351,7 +367,8 @@ const uuid=()=>{ try{ return crypto.randomUUID(); }catch(e){ return 'x'+Date.now
 let tasas={ bs:1, usd:0, eur:0, usdt:0 };
 let fechaEur='';
 let rate=0, fecha='', fuente='', consultada='';   // rate = tasas.usd (BCV), base de precios
-let products=[], settings={iva:16,gan:40,usdtLado:'ask'}, filtro='';
+let products=[], settings={iva:16,gan:40,usdtLado:'ask',auto:false}, filtro='';
+let avisoAuto=null;   // resumen de lo que la casilla automática acaba de hacer
 const MONEDAS = {
   bs:   { sim:'Bs', nom:'Bolívares',  btn:'Bs' },
   usd:  { sim:'$',  nom:'Dólar BCV',  btn:'$'  },
@@ -382,15 +399,23 @@ if(cfgOk){
 const aFila = p => ({
   id:p.id, nombre:p.name||'', monto:Number(p.monto)||0, moneda:p.cur||'bs',
   cantidad:Number(p.cant)||1, iva:!!p.iva, ganancia:Number(ganDe(p))||0, colchon:Number(p.colchon)||0,
-  snap_rate:p.snap?.rate ?? null, snap_costo_usd:p.snap?.costoUSD ?? null, snap_ts:p.snap?.ts ?? null,
-  snap_tasa_eur:p.snap?.eur ?? null, snap_tasa_usdt:p.snap?.usdt ?? null
+  snap_rate:p.snap?.tasas?.usd ?? null, snap_costo_usd:null, snap_ts:p.snap?.ts ?? null,
+  snap_tasa_eur:p.snap?.tasas?.eur ?? null, snap_tasa_usdt:p.snap?.tasas?.usdt ?? null,
+  prev_unit_bs:p.prev?.unitBs ?? null, prev_ts:p.prev?.ts ?? null
 });
+// snap viejo: {rate, costoUSD, eur, usdt, ts}  ->  nuevo: {tasas:{usd,eur,usdt}, ts}
+function migraSnap(x){
+  if(!x) return null;
+  if(x.tasas) return x;
+  return { tasas:{ usd:Number(x.rate)||0, eur:Number(x.eur)||0, usdt:Number(x.usdt)||0 }, ts:x.ts };
+}
 const aProd = f => ({
   id:f.id, name:f.nombre||'', monto:f.monto, cur:f.moneda||'bs', cant:f.cantidad??1,
   iva:!!f.iva, gan:f.ganancia, colchon:Number(f.colchon)||0 ? f.colchon : '',
-  snap: f.snap_rate ? { rate:Number(f.snap_rate), costoUSD:Number(f.snap_costo_usd), ts:f.snap_ts,
-                        eur:f.snap_tasa_eur?Number(f.snap_tasa_eur):null,
-                        usdt:f.snap_tasa_usdt?Number(f.snap_tasa_usdt):null } : null,
+  snap: f.snap_rate ? { tasas:{ usd:Number(f.snap_rate),
+                                eur:f.snap_tasa_eur?Number(f.snap_tasa_eur):0,
+                                usdt:f.snap_tasa_usdt?Number(f.snap_tasa_usdt):0 }, ts:f.snap_ts } : null,
+  prev: f.prev_unit_bs ? { unitBs:Number(f.prev_unit_bs), ts:f.prev_ts } : null,
   saved:true
 });
 
@@ -432,6 +457,9 @@ async function bajarTodo(){
   if(!ra.error && ra.data){
     settings.iva = Number(ra.data.iva); settings.gan = Number(ra.data.ganancia);
     if(ra.data.usdt_lado) settings.usdtLado = ra.data.usdt_lado;
+    settings.auto = !!ra.data.auto_actualizar;
+    document.getElementById('autoChk').checked = settings.auto;
+    syncAuto();
     store.set('bcv_settings', JSON.stringify(settings));
     document.getElementById('ivaInput').value = settings.iva;
     document.getElementById('ganInput').value = settings.gan;
@@ -446,7 +474,8 @@ function subirAjustes(){
   clearTimeout(ajusteT);
   ajusteT=setTimeout(async ()=>{
     const { error } = await sb.from('ajustes').update({
-      iva:Number(settings.iva)||0, ganancia:Number(settings.gan)||0, usdt_lado:settings.usdtLado||'ask'
+      iva:Number(settings.iva)||0, ganancia:Number(settings.gan)||0,
+      usdt_lado:settings.usdtLado||'ask', auto_actualizar:!!settings.auto
     }).eq('id',1);
     if(error) netErr('No se pudieron guardar los ajustes en la nube: '+error.message);
   }, 700);
@@ -460,6 +489,7 @@ function cargarCache(){
     if(p.colchon===undefined) p.colchon='';
     if(p.cant===undefined||p.cant==='') p.cant=1;
     if(!p.id) p.id=uuid();
+    p.snap=migraSnap(p.snap);
   });
   const c=safeParse(store.get('bcv_rate_cache'));
   if(c){
@@ -513,7 +543,9 @@ async function fetchRate(manual){
 
   if(rate) store.set('bcv_rate_cache', JSON.stringify({rate,fecha,fuente,consultada,tasas,fechaEur}));
   dot.className = rate?'dot live':'dot err';
-  renderRate(); renderList();
+  renderRate();
+  if(settings.auto) await aplicarTodos(true);   // sin preguntar, pero sí avisando
+  renderList();
   if(manual) setTimeout(()=>btn.classList.remove('spin'),500);
 }
 function haceCuanto(iso){
@@ -549,12 +581,21 @@ function renderRate(){
 /* ---------- fórmula ---------- */
 function ganDe(p){ return (p.gan===''||p.gan==null)?(Number(settings.gan)||0):(Number(p.gan)||0); }
 function cantDe(p){ const n=Number(p.cant); return (!n||n<1)?1:n; }
+// El precio de un producto guardado NO usa la tasa de hoy: usa la que tenía
+// cuando se fijó. Así no se mueve solo. Solo cambia si alguien lo acepta
+// (botón Actualizar) o si la casilla de automático está encendida.
+// Mientras se edita, sí se usan las tasas de hoy: es lo que quieres ver al cargarlo.
+function tasasDe(p){
+  if(p.saved && p.snap && p.snap.tasas && p.snap.tasas.usd) return p.snap.tasas;
+  return tasas;
+}
 function compute(p){
+  const T=tasasDe(p);
   const monto=Number(p.monto)||0;
   // Todo se lleva a Bs, que es la base; desde ahí se reexpresa en cualquier moneda.
-  const t = p.cur==='bs' ? 1 : (tasas[p.cur]||0);
+  const t = p.cur==='bs' ? 1 : (T[p.cur]||0);
   const costoBs = p.cur==='bs' ? monto : (t ? monto*t : 0);
-  const costoUSD = rate ? costoBs/rate : 0;
+  const costoUSD = T.usd ? costoBs/T.usd : 0;
   const ivaF=p.iva?(Number(settings.iva)||0)/100:0, ganF=ganDe(p)/100;
   const ivaBs=costoBs*ivaF, ganBs=costoBs*ganF;
   const preColch=costoBs*(1+ivaF+ganF), colch=Number(p.colchon)||0;
@@ -562,13 +603,65 @@ function compute(p){
   const cant=cantDe(p), totalBs=unitBs*cant, totalUSD=rate?totalBs/rate:0;
   return {costoBs,costoUSD,ivaBs,ganBs,preColch,colch,unitBs,unitUSD,cant,totalBs,totalUSD};
 }
-function cambioTasa(p){
-  if(p.cur!=='bs'||!p.saved||!p.snap||!p.snap.rate||!rate) return null;
-  const diff=(rate-p.snap.rate)/p.snap.rate;
+// Cómo quedaría el producto si aceptara las tasas de hoy.
+// - Cargado en Bs: se reindexa el costo al dólar BCV (lo que costaba en $ ahora
+//   cuesta otra cosa en Bs).
+// - Cargado en $/€/USDT: el costo no se toca; lo que cambia es la tasa con la
+//   que se convierte a Bs.
+function proyectar(p){
+  const q=Object.assign({},p);
+  if(p.cur==='bs' && p.snap?.tasas?.usd && tasas.usd){
+    q.monto=Number(((Number(p.monto)||0)*(tasas.usd/p.snap.tasas.usd)).toFixed(2));
+  }
+  q.snap={ tasas:{usd:tasas.usd,eur:tasas.eur,usdt:tasas.usdt}, ts:new Date().toISOString() };
+  return q;
+}
+function cambioPendiente(p){
+  if(!p.saved || !p.snap?.tasas || !tasas.usd) return null;
+  const ref = p.cur==='bs' ? 'usd' : p.cur;      // el Bs se vigila contra el dólar BCV
+  const tAntes=p.snap.tasas[ref], tHoy=tasas[ref];
+  if(!tAntes || !tHoy) return null;
+  const diff=(tHoy-tAntes)/tAntes;
   if(Math.abs(diff)<UMBRAL_TASA) return null;
-  const montoUSDsave=p.snap.costoUSD || ((Number(p.monto)||0)/p.snap.rate);
-  return { subio:diff>0, pct:Math.abs(diff*100), tasaAntes:p.snap.rate, tasaHoy:rate,
-           montoUSD:montoUSDsave, montoAntes:Number(p.monto)||0, nuevoMontoBs:montoUSDsave*rate, ts:p.snap.ts };
+  const antes=compute(p), hoy=compute(proyectar(p));
+  if(!antes.unitBs) return null;
+  const delta=(hoy.unitBs/antes.unitBs)-1;
+  return { ref, pct:Math.abs(diff*100), tasaAntes:tAntes, tasaHoy:tHoy,
+           antesBs:antes.unitBs, hoyBs:hoy.unitBs,
+           deltaPct:Math.abs(delta*100), subioPrecio:delta>0, ts:p.snap.ts };
+}
+// Antes de mover nada, se anota el precio que tenía. Así, actualice a mano o
+// solo, siempre se puede decir "de cuánto a cuánto" y en qué porcentaje.
+function aplicarTasas(p){
+  const antes=compute(p);
+  const q=proyectar(p);
+  p.monto=q.monto; p.snap=q.snap;
+  p.prev={ unitBs:antes.unitBs, ts:new Date().toISOString() };
+}
+// Cuánto cambió un producto respecto a su precio anterior.
+function ajusteHecho(p){
+  if(!p.prev?.unitBs) return null;
+  const hoy=compute(p).unitBs;
+  if(!hoy) return null;
+  const delta=(hoy/p.prev.unitBs)-1;
+  if(Math.abs(delta)<0.0005) return null;
+  return { antesBs:p.prev.unitBs, hoyBs:hoy, pct:Math.abs(delta*100), subio:delta>0, ts:p.prev.ts };
+}
+async function aplicarTodos(auto){
+  const pend=products.filter(p=>p.saved && cambioPendiente(p));
+  if(!pend.length) return 0;
+  const cs=pend.map(cambioPendiente);
+  const resumen={ n:pend.length, maxPct:Math.max(...cs.map(c=>c.deltaPct)), suben:cs.filter(c=>c.subioPrecio).length };
+  pend.forEach(aplicarTasas);
+  if(auto) avisoAuto=resumen;
+  cacheLocal();
+  if(MODO==='nube' && user){
+    const { error } = await sb.from('productos').upsert(pend.map(aFila));
+    if(error) netErr('No se pudieron guardar los precios nuevos: '+error.message);
+    else netErr('');
+  }
+  renderList();
+  return pend.length;
 }
 
 /* ---------- render ---------- */
@@ -600,11 +693,37 @@ function renderList(){
 }
 function renderAlertaGlobal(){
   const box=document.getElementById('alertaGlobal');
-  const afect=products.filter(p=>{ const ct=cambioTasa(p); return ct&&ct.subio; });
-  if(afect.length===0){ box.classList.remove('show'); box.innerHTML=''; return; }
-  const n=afect.length;
-  box.innerHTML=`⚠️ <b>El dólar subió desde que cargaste ${n>1?'estos productos':'este producto'}.</b> ${n} producto${n>1?'s':''} cargado${n>1?'s':''} en Bs ${n>1?'están':'está'} quedando por debajo de su costo de reposición. Abajo te digo a cuánto ${n>1?'deberían':'debería'} estar.`;
+  const pend=products.map(p=>cambioPendiente(p)).filter(Boolean);
+  box.classList.remove('info');
+
+  // Automático encendido: no se pregunta, pero sí se informa lo que se hizo.
+  if(settings.auto){
+    if(!avisoAuto){ box.classList.remove('show'); box.innerHTML=''; return; }
+    const a=avisoAuto, verbo = a.suben===a.n ? 'subieron' : (a.suben===0 ? 'bajaron' : 'cambiaron');
+    box.className='alerta show info';
+    box.innerHTML=`
+      ✓ <b>Se ${a.n>1?'actualizaron':'actualizó'} ${a.n} precio${a.n>1?'s':''} solo${a.n>1?'s':''}</b> porque la tasa cambió:
+      ${verbo} hasta ${a.maxPct.toFixed(1)}%. Cada producto te dice abajo de cuánto a cuánto quedó.
+      <button class="act" id="btnOk">Entendido</button>`;
+    document.getElementById('btnOk').addEventListener('click',()=>{ avisoAuto=null; renderAlertaGlobal(); });
+    return;
+  }
+
+  if(pend.length===0){ box.classList.remove('show'); box.innerHTML=''; return; }
+  const n=pend.length;
+  const maxPct=Math.max(...pend.map(c=>c.deltaPct));
+  const suben=pend.filter(c=>c.subioPrecio).length;
+  const verbo = suben===n ? 'suben' : (suben===0 ? 'bajan' : 'cambian');
+  box.innerHTML=`
+    ⚠️ <b>La tasa cambió.</b> ${n} producto${n>1?'s':''} ${n>1?'siguen':'sigue'} con el precio que ${n>1?'fijaron':'fijó'} antes.
+    Si ${n>1?'los actualizas':'lo actualizas'}, ${verbo} hasta ${maxPct.toFixed(1)}%.
+    <button class="act" id="btnTodos">Actualizar ${n>1?('los '+n+' precios'):'el precio'}</button>
+    <div class="cmp2">Cada producto te dice abajo exactamente cuánto cambia. Si no haces nada, los precios se quedan como están.</div>`;
   box.classList.add('show');
+  document.getElementById('btnTodos').addEventListener('click', async (e)=>{
+    e.target.disabled=true; e.target.textContent='Actualizando…';
+    await aplicarTodos();
+  });
 }
 function replaceCard(node,p){ const n=buildCard(p); node.replaceWith(n); return n; }
 function buildCard(p){
@@ -615,8 +734,8 @@ function buildCard(p){
 }
 
 function renderView(card,p){
-  const c=compute(p), ct=cambioTasa(p);
-  if(ct&&ct.subio) card.classList.add('alert');
+  const c=compute(p), ct=cambioPendiente(p);
+  if(ct) card.classList.add('alert');
   const costoTxt = MONEDAS[p.cur].sim+' '+fmt.format(Number(p.monto)||0);
   const colchTxt = c.colch>0?` · colchón +${bs(c.colch)}`:'';
   card.innerHTML=`
@@ -632,7 +751,8 @@ function renderView(card,p){
       <span class="k">Total por <span data-o="cant">1</span> unidad<span data-o="plural"></span></span>
       <span class="v"><span class="bs" data-o="totalbs">—</span><span class="usd" data-o="totalusd">—</span></span>
     </div>
-    <div class="rc ${ct?'show':''} ${ct&&!ct.subio?'down':''}" data-rc></div>
+    <div class="prev" data-prev></div>
+    <div class="rc ${ct?'show':''} ${ct&&!ct.subioPrecio?'down':''}" data-rc></div>
     <div class="btnrow">
       <button class="btn btn-ghost editbtn">Editar</button>
       <button class="btn btn-danger delbtn">Eliminar</button>
@@ -641,21 +761,30 @@ function renderView(card,p){
   q('unitbs').textContent=bs(c.unitBs); q('unitusd').innerHTML=otrasMonedas(c.unitBs,'bs');
   q('cant').textContent=c.cant; q('plural').textContent=c.cant===1?'':'es';
   q('totalbs').textContent=bs(c.totalBs); q('totalusd').innerHTML=otrasMonedas(c.totalBs,'bs');
+
+  // "De cuánto a cuánto" del último ajuste, lo haya hecho la casilla o una persona.
+  const aj=ajusteHecho(p), ePrev=card.querySelector('[data-prev]');
+  if(aj && ePrev){
+    const d=new Date(aj.ts), f=!isNaN(d)?d.toLocaleDateString('es-VE',{day:'2-digit',month:'short'}):'';
+    ePrev.innerHTML=`${aj.subio?'↑':'↓'} Ajustado${f?' el '+f:''}: <s>${bs(aj.antesBs)}</s> → ${bs(aj.hoyBs)} `
+      + `<span class="${aj.subio?'up':'down'}">(${aj.subio?'+':'−'}${aj.pct.toFixed(1)}%)</span>`;
+  } else if(ePrev){ ePrev.style.display='none'; }
+
   if(ct){
     const d=new Date(ct.ts), f=!isNaN(d)?d.toLocaleDateString('es-VE',{day:'2-digit',month:'short'}):'';
+    const sgn=ct.subioPrecio?'+':'−';
     card.querySelector('[data-rc]').innerHTML=`
-      ${ct.subio?'⚠️':'ℹ️'} <b>La tasa del dólar cambió.</b> Cargaste este producto${f?' el '+f:''} con el dólar a
-      ${fmtRate.format(ct.tasaAntes)} y hoy ${ct.subio?'subió':'bajó'} a ${fmtRate.format(ct.tasaHoy)} (${ct.pct.toFixed(1)}%).
+      ${ct.subioPrecio?'⚠️':'ℹ️'} <b>${MONEDAS[ct.ref].nom} cambió ${ct.pct.toFixed(1)}%</b>
+      desde que fijaste este precio${f?' el '+f:''}: de ${fmtRate.format(ct.tasaAntes)} a ${fmtRate.format(ct.tasaHoy)}.
       <div class="cmp">
-        Costo cargado: ${bs(ct.montoAntes)} = ${usd(ct.montoUSD)}<br>
-        Esos ${usd(ct.montoUSD)} hoy son: <span class="now">${bs(ct.nuevoMontoBs)}</span>
+        Precio de ahora: ${bs(ct.antesBs)}<br>
+        Con la tasa de hoy: <span class="now">${bs(ct.hoyBs)}</span> (${sgn}${ct.deltaPct.toFixed(1)}%)
       </div>
-      <button class="act">Actualizar costo a ${bs(ct.nuevoMontoBs)}</button>`;
+      <button class="act">Actualizar a ${bs(ct.hoyBs)}</button>
+      <div class="rcno">Si no lo actualizas, se queda en ${bs(ct.antesBs)}.</div>`;
     card.querySelector('.act').addEventListener('click', async (e)=>{
-      e.target.disabled=true;
-      p.monto=Number(ct.nuevoMontoBs.toFixed(2));
-      const nc=compute(p);
-      p.snap={ rate, costoUSD:nc.costoUSD, eur:tasas.eur||null, usdt:tasas.usdt||null, ts:new Date().toISOString() };
+      e.target.disabled=true; e.target.textContent='Actualizando…';
+      aplicarTasas(p);
       await subirProducto(p);
       replaceCard(card,p); renderAlertaGlobal();
     });
@@ -791,8 +920,8 @@ function renderEditor(card,p){
     }
     if(!(Number(p.cant)>0)) p.cant=1;
     const btn=e.target; btn.disabled=true; btn.textContent='Guardando…';
-    const c=compute(p);
-    if(rate) p.snap={ rate, costoUSD:c.costoUSD, eur:tasas.eur||null, usdt:tasas.usdt||null, ts:new Date().toISOString() };
+    // Al guardar se congelan las tasas del momento: son las que fijan el precio.
+    if(tasas.usd) p.snap={ tasas:{usd:tasas.usd,eur:tasas.eur,usdt:tasas.usdt}, ts:new Date().toISOString() };
     p.saved=true; delete p._new; delete p._backup;
     await subirProducto(p);
     replaceCard(card,p); renderAlertaGlobal();
@@ -855,6 +984,14 @@ document.getElementById('addBtn').addEventListener('click',()=>{
   if(last){ last.scrollIntoView({behavior:'smooth',block:'center'}); const fi=last.querySelector('input'); if(fi) fi.focus(); }
 });
 document.getElementById('refreshBtn').addEventListener('click',()=>fetchRate(true));
+const autoChk=document.getElementById('autoChk');
+function syncAuto(){ autoChk.closest('.ivatoggle').classList.toggle('active', autoChk.checked); }
+autoChk.addEventListener('change', async ()=>{
+  settings.auto=autoChk.checked; syncAuto(); subirAjustes();
+  if(settings.auto) await aplicarTodos(true);   // al encenderla, se pone al día de una vez
+  renderList();
+});
+
 const segUsdt=document.getElementById('segUsdt');
 function syncSegUsdt(){
   segUsdt.querySelectorAll('button').forEach(b=>b.classList.toggle('on', b.dataset.lado===(settings.usdtLado||'ask')));
@@ -911,6 +1048,7 @@ setInterval(()=>fetchRate(false), 30*60*1000);
 /* ---------- boot ---------- */
 cargarCache();
 ivaInput.value=settings.iva; ganInput.value=settings.gan; syncSegUsdt();
+autoChk.checked=!!settings.auto; syncAuto();
 if(MODO==='nube'){
   const { data } = await sb.auth.getSession();
   if(data.session){ user=data.session.user; entrarApp(); }
